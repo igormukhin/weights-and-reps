@@ -30,12 +30,12 @@ and testing of each story.
 
 **Purpose**: Initialize the project and install all dependencies before any feature work begins.
 
-- [ ] T001 Initialize Vite + Vue 3 + TypeScript project at repository root (`npm create vite@latest . -- --template vue-ts`)
-- [ ] T002 Install and configure Vuetify 3: `npm install vuetify@^3 @mdi/font`; create `src/plugins/vuetify.ts` with theme config and register in `src/main.ts`
-- [ ] T003 [P] Install Firebase JS SDK v10: `npm install firebase`; create `src/services/firebase.ts` that initialises the Firebase app from `import.meta.env` variables
-- [ ] T004 [P] Install Vue Router 4 and Pinia: `npm install vue-router@^4 pinia`; register both in `src/main.ts`
-- [ ] T005 [P] Install vuedraggable@next: `npm install vuedraggable@next`
-- [ ] T006 Create `.env.example` at repo root documenting all required `VITE_FIREBASE_*` keys (`VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`); add `.env.local` to `.gitignore`
+- [x] T001 Initialize Vite + Vue 3 + TypeScript project at repository root (`npm create vite@latest . -- --template vue-ts`)
+- [x] T002 Install and configure Vuetify 3: `npm install vuetify@^3 @mdi/font`; create `src/plugins/vuetify.ts` with theme config and register in `src/main.ts`
+- [x] T003 [P] Install Firebase JS SDK v10: `npm install firebase`; create `src/services/firebase.ts` that initialises the Firebase app from `import.meta.env` variables
+- [x] T004 [P] Install Vue Router 4 and Pinia: `npm install vue-router@^4 pinia`; register both in `src/main.ts`
+- [x] T005 [P] Install vuedraggable@next: `npm install vuedraggable@next`
+- [x] T006 Create `.env.example` at repo root documenting all required `VITE_FIREBASE_*` keys (`VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`); add `.env.local` to `.gitignore`
 
 ---
 
@@ -45,13 +45,13 @@ and testing of each story.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T007 [P] Create all TypeScript interfaces in `src/types/index.ts` exactly as specified in `specs/001-training-tracker-app/contracts/typescript-interfaces.ts` (`Set`, `Session`, `Exercise`, `CreateExercisePayload`, `RenameExercisePayload`, `SaveSessionPayload`, `SaveStatus`, `SessionState`)
-- [ ] T008 Write `firestore.rules` at repo root with the per-user UID isolation rule from `specs/001-training-tracker-app/contracts/firestore-schema.md`; add `firebase.json` with Firestore rules pointer
-- [ ] T009 Implement auth service in `src/services/auth.ts`: `signInWithGoogle()` (GoogleAuthProvider popup), `signOut()`, `onAuthStateChanged` listener export
-- [ ] T010 [P] Create Pinia auth store in `src/stores/auth.ts`: `currentUser: User | null`, `isAuthenticated: boolean`, `setUser(user)` action; init auth listener on store creation
-- [ ] T011 Configure Vue Router in `src/router/index.ts`: routes `/login` → `LoginView`, `/exercises` → `ExercisesView`, `/exercises/:id` → `ExerciseDetailView`; `beforeEach` guard redirects unauthenticated users to `/login` and authenticated users away from `/login` to `/exercises`
-- [ ] T012 Create `src/App.vue` with `<router-view>` and a `watchEffect` that syncs Firebase `onAuthStateChanged` into the auth store
-- [ ] T013 Create `src/views/LoginView.vue`: centered Vuetify card with app title and "Sign in with Google" button that calls `signInWithGoogle()` from auth service
+- [x] T007 [P] Create all TypeScript interfaces in `src/types/index.ts` exactly as specified in `specs/001-training-tracker-app/contracts/typescript-interfaces.ts` (`Set`, `Session`, `Exercise`, `CreateExercisePayload`, `RenameExercisePayload`, `SaveSessionPayload`, `SaveStatus`, `SessionState`)
+- [x] T008 Write `firestore.rules` at repo root with the per-user UID isolation rule from `specs/001-training-tracker-app/contracts/firestore-schema.md`; add `firebase.json` with Firestore rules pointer
+- [x] T009 Implement auth service in `src/services/auth.ts`: `signInWithGoogle()` (GoogleAuthProvider popup), `signOut()`, `onAuthStateChanged` listener export
+- [x] T010 [P] Create Pinia auth store in `src/stores/auth.ts`: `currentUser: User | null`, `isAuthenticated: boolean`, `setUser(user)` action; init auth listener on store creation
+- [x] T011 Configure Vue Router in `src/router/index.ts`: routes `/login` → `LoginView`, `/exercises` → `ExercisesView`, `/exercises/:id` → `ExerciseDetailView`; `beforeEach` guard redirects unauthenticated users to `/login` and authenticated users away from `/login` to `/exercises`
+- [x] T012 Create `src/App.vue` with `<router-view>` and a `watchEffect` that syncs Firebase `onAuthStateChanged` into the auth store
+- [x] T013 Create `src/views/LoginView.vue`: centered Vuetify card with app title and "Sign in with Google" button that calls `signInWithGoogle()` from auth service
 
 **Checkpoint**: Firebase initialised, auth guard active, sign-in screen functional — all user story screens are now reachable after sign-in.
 
@@ -69,15 +69,15 @@ previous session.
 
 ### Implementation for User Story 1 + 3
 
-- [ ] T014 [P] [US1] Implement Firestore exercises service (read path only for now) in `src/services/exercises.ts`: `getExercises(uid)` returns non-hidden exercises ordered by `position`; `getExerciseById(uid, id)` returns a single exercise document
-- [ ] T015 [P] [US1] Implement Firestore sessions service in `src/services/sessions.ts`: `getTodaySession(uid, exerciseId, dateStr)` (point lookup); `getLastSession(uid, exerciseId, todayStr)` (orderBy date desc, limit 2, return the non-today result); `saveSession(uid, exerciseId, payload: SaveSessionPayload)` (setDoc with merge)
-- [ ] T016 [P] [US1] Create Pinia exercises store in `src/stores/exercises.ts`: `exercises: Exercise[]` state; `loadExercises(uid)` action calling exercises service; `getById(id)` getter
-- [ ] T017 [US1] Create `useSession` composable in `src/composables/useSession.ts`: on mount, call `getTodaySession` and `getLastSession`; compute initial set rows (match previous session set count, default 3 if no history); expose `todaySets`, `lastSets`, `lastSessionDate` (formatted DD.MM.YYYY), `saveStatus`, `saveError`, `updateSet(index, field, value)`, `addSet()` as per `SessionState` interface
-- [ ] T018 [US1] Add auto-save debounce to `useSession` composable in `src/composables/useSession.ts`: `watchEffect` with manual `setTimeout`/`clearTimeout` (2000ms); on fire, filter empty set rows (weight < 0.5 or reps < 1 treated as empty), call `saveSession`; set `saveStatus` through `'saving'` → `'saved'` or `'error'`; expose error message in `saveError`
-- [ ] T019 [P] [US1] Create `SetRow.vue` in `src/components/session/SetRow.vue`: props `setNumber`, `lastWeight`, `lastReps`, `newWeight`, `newReps`; emits `update:newWeight` and `update:newReps`; Vuetify text fields for new values; `+`/`-` icon buttons (step 2.5 for weight, step 1 for reps); tap on empty new-weight or new-reps field triggers prefill from previous set (parent passes `prevNewWeight`/`prevNewReps` props); last weight/reps shown as read-only text
-- [ ] T020 [P] [US1] Create `AddSetButton.vue` in `src/components/session/AddSetButton.vue`: Vuetify outlined button labelled "+ Add set"; emits `add-set` event on click
-- [ ] T021 [US1] Create `ExercisesView.vue` in `src/views/ExercisesView.vue` (minimal for US1 navigation): on mount load exercises from store; show scrollable list of exercise names as tappable rows; navigate to `/exercises/:id` on tap; show empty-state prompt ("Add your first exercise") when list is empty
-- [ ] T022 [US1] Create `ExerciseDetailView.vue` in `src/views/ExerciseDetailView.vue`: read `:id` from route; load exercise from store; instantiate `useSession(uid, exerciseId)`; render header (exercise name + last session date); render `SetRow` for each set in `todaySets` passing corresponding `lastSets[i]` values; render `AddSetButton`; render save status indicator (subtle chip or text: "Saving…" / "Saved" / error snackbar with message)
+- [x] T014 [P] [US1] Implement Firestore exercises service (read path only for now) in `src/services/exercises.ts`: `getExercises(uid)` returns non-hidden exercises ordered by `position`; `getExerciseById(uid, id)` returns a single exercise document
+- [x] T015 [P] [US1] Implement Firestore sessions service in `src/services/sessions.ts`: `getTodaySession(uid, exerciseId, dateStr)` (point lookup); `getLastSession(uid, exerciseId, todayStr)` (orderBy date desc, limit 2, return the non-today result); `saveSession(uid, exerciseId, payload: SaveSessionPayload)` (setDoc with merge)
+- [x] T016 [P] [US1] Create Pinia exercises store in `src/stores/exercises.ts`: `exercises: Exercise[]` state; `loadExercises(uid)` action calling exercises service; `getById(id)` getter
+- [x] T017 [US1] Create `useSession` composable in `src/composables/useSession.ts`: on mount, call `getTodaySession` and `getLastSession`; compute initial set rows (match previous session set count, default 3 if no history); expose `todaySets`, `lastSets`, `lastSessionDate` (formatted DD.MM.YYYY), `saveStatus`, `saveError`, `updateSet(index, field, value)`, `addSet()` as per `SessionState` interface
+- [x] T018 [US1] Add auto-save debounce to `useSession` composable in `src/composables/useSession.ts`: `watchEffect` with manual `setTimeout`/`clearTimeout` (2000ms); on fire, filter empty set rows (weight < 0.5 or reps < 1 treated as empty), call `saveSession`; set `saveStatus` through `'saving'` → `'saved'` or `'error'`; expose error message in `saveError`
+- [x] T019 [P] [US1] Create `SetRow.vue` in `src/components/session/SetRow.vue`: props `setNumber`, `lastWeight`, `lastReps`, `newWeight`, `newReps`; emits `update:newWeight` and `update:newReps`; Vuetify text fields for new values; `+`/`-` icon buttons (step 2.5 for weight, step 1 for reps); tap on empty new-weight or new-reps field triggers prefill from previous set (parent passes `prevNewWeight`/`prevNewReps` props); last weight/reps shown as read-only text
+- [x] T020 [P] [US1] Create `AddSetButton.vue` in `src/components/session/AddSetButton.vue`: Vuetify outlined button labelled "+ Add set"; emits `add-set` event on click
+- [x] T021 [US1] Create `ExercisesView.vue` in `src/views/ExercisesView.vue` (minimal for US1 navigation): on mount load exercises from store; show scrollable list of exercise names as tappable rows; navigate to `/exercises/:id` on tap; show empty-state prompt ("Add your first exercise") when list is empty
+- [x] T022 [US1] Create `ExerciseDetailView.vue` in `src/views/ExerciseDetailView.vue`: read `:id` from route; load exercise from store; instantiate `useSession(uid, exerciseId)`; render header (exercise name + last session date); render `SetRow` for each set in `todaySets` passing corresponding `lastSets[i]` values; render `AddSetButton`; render save status indicator (subtle chip or text: "Saving…" / "Saved" / error snackbar with message)
 
 **Checkpoint**: User can sign in, see an exercise (must exist in Firestore), open it, enter
 weights and reps, and data auto-saves. Last session values are visible as read-only reference.
@@ -98,14 +98,14 @@ and reload — verify order persists.
 
 ### Implementation for User Story 2
 
-- [ ] T023 [P] [US2] Extend exercises service in `src/services/exercises.ts`: add `createExercise(uid, name, position)`, `renameExercise(uid, id, newName)`, `hideExercise(uid, id)`, `updatePositions(uid, exercises: Pick<Exercise, 'id' | 'position'>[])` (Firestore batch write)
-- [ ] T024 [US2] Create `useExercises` composable in `src/composables/useExercises.ts`: wraps exercises store and service; implements `addExercise(name)` (duplicate check case-insensitive against all non-hidden exercises, then prefix-match position calculation, then `createExercise`, then reload store); `renameExercise(id, newName)` (check uniqueness against other exercises only — capitalisation-only change on own name allowed); `hideExercise(id)`; `reorder(newList: Exercise[])` (re-index positions 1…n, batch update via `updatePositions`)
-- [ ] T025 [US2] Implement prefix-match insertion in `useExercises.ts` `addExercise` method: iterate non-hidden exercises in position order; find the exercise `E` where `newName.toLowerCase().startsWith(E.name.toLowerCase())` and `E.name.length` is maximised; insert new exercise at `E.position + 1` and shift all subsequent exercises up by 1 before the batch write
-- [ ] T026 [P] [US2] Create `AddExerciseDialog.vue` in `src/components/exercises/AddExerciseDialog.vue`: Vuetify dialog; name text field; validates non-empty and unique (case-insensitive) on submit; calls `useExercises.addExercise`; shows validation error inline; emits `close` on success or cancel
-- [ ] T027 [P] [US2] Create `EditExerciseDialog.vue` in `src/components/exercises/EditExerciseDialog.vue`: Vuetify dialog pre-filled with current name; validates uniqueness against other exercises only (capitalisation-only change to own name allowed); calls `useExercises.renameExercise`; shows validation error inline; emits `close` on success or cancel
-- [ ] T028 [P] [US2] Create `HideExerciseDialog.vue` in `src/components/exercises/HideExerciseDialog.vue`: Vuetify confirmation dialog with message explicitly stating hiding is permanent and cannot be undone in the app; confirm and cancel buttons; calls `useExercises.hideExercise` on confirm; emits `close`
-- [ ] T029 [US2] Create `ExerciseListItem.vue` in `src/components/exercises/ExerciseListItem.vue`: displays exercise name; drag handle icon (for vuedraggable); edit icon button (opens `EditExerciseDialog`); hide icon button (opens `HideExerciseDialog`); tap on name row navigates to `/exercises/:id`
-- [ ] T030 [US2] Update `ExercisesView.vue` in `src/views/ExercisesView.vue`: replace plain list with `vuedraggable` list of `ExerciseListItem` components; wire drag-end event to `useExercises.reorder`; wire "Add exercise" FAB to open `AddExerciseDialog`; preserve empty-state prompt from T021
+- [x] T023 [P] [US2] Extend exercises service in `src/services/exercises.ts`: add `createExercise(uid, name, position)`, `renameExercise(uid, id, newName)`, `hideExercise(uid, id)`, `updatePositions(uid, exercises: Pick<Exercise, 'id' | 'position'>[])` (Firestore batch write)
+- [x] T024 [US2] Create `useExercises` composable in `src/composables/useExercises.ts`: wraps exercises store and service; implements `addExercise(name)` (duplicate check case-insensitive against all non-hidden exercises, then prefix-match position calculation, then `createExercise`, then reload store); `renameExercise(id, newName)` (check uniqueness against other exercises only — capitalisation-only change on own name allowed); `hideExercise(id)`; `reorder(newList: Exercise[])` (re-index positions 1…n, batch update via `updatePositions`)
+- [x] T025 [US2] Implement prefix-match insertion in `useExercises.ts` `addExercise` method: iterate non-hidden exercises in position order; find the exercise `E` where `newName.toLowerCase().startsWith(E.name.toLowerCase())` and `E.name.length` is maximised; insert new exercise at `E.position + 1` and shift all subsequent exercises up by 1 before the batch write
+- [x] T026 [P] [US2] Create `AddExerciseDialog.vue` in `src/components/exercises/AddExerciseDialog.vue`: Vuetify dialog; name text field; validates non-empty and unique (case-insensitive) on submit; calls `useExercises.addExercise`; shows validation error inline; emits `close` on success or cancel
+- [x] T027 [P] [US2] Create `EditExerciseDialog.vue` in `src/components/exercises/EditExerciseDialog.vue`: Vuetify dialog pre-filled with current name; validates uniqueness against other exercises only (capitalisation-only change to own name allowed); calls `useExercises.renameExercise`; shows validation error inline; emits `close` on success or cancel
+- [x] T028 [P] [US2] Create `HideExerciseDialog.vue` in `src/components/exercises/HideExerciseDialog.vue`: Vuetify confirmation dialog with message explicitly stating hiding is permanent and cannot be undone in the app; confirm and cancel buttons; calls `useExercises.hideExercise` on confirm; emits `close`
+- [x] T029 [US2] Create `ExerciseListItem.vue` in `src/components/exercises/ExerciseListItem.vue`: displays exercise name; drag handle icon (for vuedraggable); edit icon button (opens `EditExerciseDialog`); hide icon button (opens `HideExerciseDialog`); tap on name row navigates to `/exercises/:id`
+- [x] T030 [US2] Update `ExercisesView.vue` in `src/views/ExercisesView.vue`: replace plain list with `vuedraggable` list of `ExerciseListItem` components; wire drag-end event to `useExercises.reorder`; wire "Add exercise" FAB to open `AddExerciseDialog`; preserve empty-state prompt from T021
 
 **Checkpoint**: Full exercise management functional: add (with prefix-match insertion),
 rename, hide (with confirmation), drag-to-reorder persisted across sessions.
@@ -116,10 +116,10 @@ rename, hide (with confirmation), drag-to-reorder persisted across sessions.
 
 **Purpose**: Final quality pass across all screens.
 
-- [ ] T031 [P] Add `<meta name="viewport" content="width=device-width, initial-scale=1">` to `index.html`; configure Vuetify display breakpoints for mobile-first in `src/plugins/vuetify.ts`
-- [ ] T032 [P] Create date formatting utility `formatGermanDate(isoDateStr: string): string` (converts `YYYY-MM-DD` to `DD.MM.YYYY`) in `src/utils/date.ts`; replace any inline date formatting in `ExerciseDetailView.vue` and `useSession.ts` with this utility
-- [ ] T033 Deploy Firestore security rules (`firebase deploy --only firestore:rules`) and run the full manual walkthrough from `specs/001-training-tracker-app/quickstart.md` to validate end-to-end
-- [ ] T034 [P] Clean up `src/App.vue` and remove Vite scaffold boilerplate files (`src/components/HelloWorld.vue`, `src/assets/vue.svg`, etc.)
+- [x] T031 [P] Add `<meta name="viewport" content="width=device-width, initial-scale=1">` to `index.html`; configure Vuetify display breakpoints for mobile-first in `src/plugins/vuetify.ts`
+- [x] T032 [P] Create date formatting utility `formatGermanDate(isoDateStr: string): string` (converts `YYYY-MM-DD` to `DD.MM.YYYY`) in `src/utils/date.ts`; replace any inline date formatting in `ExerciseDetailView.vue` and `useSession.ts` with this utility
+- [x] T033 Deploy Firestore security rules (`firebase deploy --only firestore:rules`) and run the full manual walkthrough from `specs/001-training-tracker-app/quickstart.md` to validate end-to-end
+- [x] T034 [P] Clean up `src/App.vue` and remove Vite scaffold boilerplate files (`src/components/HelloWorld.vue`, `src/assets/vue.svg`, etc.)
 
 ---
 
