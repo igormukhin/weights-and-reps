@@ -18,13 +18,15 @@
       <!-- Draggable exercise list -->
       <v-list v-else lines="one" class="pa-0">
         <draggable
-          :model-value="exercises"
+          v-model="exercises"
           item-key="id"
           handle=".drag-handle"
           @end="onDragEnd"
         >
           <template #item="{ element }">
-            <ExerciseListItem :exercise="element" />
+            <div>
+              <ExerciseListItem :exercise="element" />
+            </div>
           </template>
         </draggable>
       </v-list>
@@ -49,14 +51,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import draggable from 'vuedraggable'
 import { useAuthStore } from '@/stores/auth'
 import { useExercisesStore } from '@/stores/exercises'
 import { useExercises } from '@/composables/useExercises'
 import { signOut } from '@/services/auth'
-import type { Exercise } from '@/types'
 import ExerciseListItem from '@/components/exercises/ExerciseListItem.vue'
 import AddExerciseDialog from '@/components/exercises/AddExerciseDialog.vue'
 
@@ -67,7 +68,8 @@ const router = useRouter()
 const uid = authStore.currentUser!.uid
 const { reorder } = useExercises(uid)
 
-const exercises = computed(() => exercisesStore.exercises)
+const exercises = ref([...exercisesStore.exercises])
+watch(() => exercisesStore.exercises, (val) => { exercises.value = [...val] })
 const showAddDialog = ref(false)
 
 onMounted(async () => {
@@ -86,9 +88,6 @@ async function onAddDialogClose(): Promise<void> {
 
 async function onDragEnd(event: { newIndex: number; oldIndex: number }): Promise<void> {
   if (event.newIndex === event.oldIndex) return
-  const reordered = [...exercises.value]
-  const [moved] = reordered.splice(event.oldIndex, 1)
-  reordered.splice(event.newIndex, 0, moved as Exercise)
-  await reorder(reordered)
+  await reorder(exercises.value)
 }
 </script>
