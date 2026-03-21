@@ -1,8 +1,10 @@
 # weights-and-reps Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-03-20
+Auto-generated from all feature plans. Last updated: 2026-03-21
 
 ## Active Technologies
+- TypeScript 5.x (strict mode) + Vue 3 (Composition API), Vuetify 3, Pinia, Firebase SDK v10+ (002-exercise-detail-redesign)
+- Firestore — `users/{uid}/exercises/{exerciseId}/sessions/{YYYY-MM-DD}` (002-exercise-detail-redesign)
 
 - TypeScript 5.x (strict mode) + Vue 3 (Composition API), Vuetify 3, Vue Router 4, Pinia, (001-training-tracker-app)
 
@@ -32,6 +34,7 @@ npm run lint    # ESLint + TypeScript check
 TypeScript 5.x (strict mode): Follow standard conventions
 
 ## Recent Changes
+- 002-exercise-detail-redesign: Added TypeScript 5.x (strict mode) + Vue 3 (Composition API), Vuetify 3, Pinia, Firebase SDK v10+
 
 - 001-training-tracker-app: Added TypeScript 5.x (strict mode) + Vue 3 (Composition API), Vuetify 3, Vue Router 4, Pinia,
 

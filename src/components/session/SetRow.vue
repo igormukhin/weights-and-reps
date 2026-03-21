@@ -5,18 +5,8 @@
       {{ setNumber }}
     </v-col>
 
-    <!-- Last weight -->
-    <v-col cols="2" class="text-center text-body-2 text-medium-emphasis">
-      {{ lastWeight ?? '–' }}
-    </v-col>
-
-    <!-- Last reps -->
-    <v-col cols="1" class="text-center text-body-2 text-medium-emphasis">
-      {{ lastReps ?? '–' }}
-    </v-col>
-
     <!-- New weight -->
-    <v-col cols="4" class="px-1">
+    <v-col cols="6" class="px-1">
       <div class="d-flex align-center">
         <v-btn
           icon="mdi-minus"
@@ -48,7 +38,7 @@
     </v-col>
 
     <!-- New reps -->
-    <v-col cols="4" class="px-1">
+    <v-col cols="5" class="px-1">
       <div class="d-flex align-center">
         <v-btn
           icon="mdi-minus"
@@ -84,8 +74,6 @@
 <script setup lang="ts">
 const props = defineProps<{
   setNumber: number
-  lastWeight?: number
-  lastReps?: number
   newWeight?: number
   newReps?: number
   /** New weight from the set immediately above this one (for prefill). */
@@ -100,7 +88,6 @@ const emit = defineEmits<{
 }>()
 
 function onWeightFocus(): void {
-  // If empty, prefill from the previous set's new weight
   if (props.newWeight === undefined && props.prevNewWeight !== undefined) {
     emit('update:newWeight', props.prevNewWeight)
   }

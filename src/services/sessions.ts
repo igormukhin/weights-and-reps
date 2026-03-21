@@ -4,6 +4,7 @@ import {
   getDoc,
   getDocs,
   setDoc,
+  deleteDoc,
   query,
   orderBy,
   limit,
@@ -55,4 +56,12 @@ export async function saveSession(
     },
     { merge: true },
   )
+}
+
+export async function deleteSession(
+  uid: string,
+  exerciseId: string,
+  dateStr: string,
+): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'exercises', exerciseId, 'sessions', dateStr))
 }

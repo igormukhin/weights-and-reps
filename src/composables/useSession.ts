@@ -1,12 +1,18 @@
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import type { Ref } from 'vue'
 import type { Set, SaveStatus } from '@/types'
-import { getTodaySession, getLastSession, saveSession } from '@/services/sessions'
+import {
+  getTodaySession,
+  getLastSession,
+  saveSession,
+  deleteSession as deleteSessionService,
+} from '@/services/sessions'
 import { todayISO, formatGermanDate } from '@/utils/date'
 
-const DEFAULT_SET_COUNT = 3
-
 export function useSession(uid: string, exerciseId: string) {
+  const isLoading = ref(true)
+  const hasTodaySession = ref(false)
+  const isSessionPersisted = ref(false)
   const todaySets = ref<Partial<Set>[]>([])
   const lastSets = ref<Set[]>([])
   const lastSessionDate = ref('')
@@ -28,20 +34,36 @@ export function useSession(uid: string, exerciseId: string) {
     lastSets.value = lastSession?.sets ?? []
     lastSessionDate.value = lastSession ? formatGermanDate(lastSession.date) : ''
 
-    if (todaySession && todaySession.sets.length > 0) {
-      // Restore today's logged data
-      todaySets.value = todaySession.sets.map((s) => ({ ...s }))
+    isLoading.value = false
+
+    if (todaySession) {
+      hasTodaySession.value = true
+      isSessionPersisted.value = true
+      const loaded = todaySession.sets.map((s) => ({ ...s }))
+      todaySets.value = loaded.length < 3
+        ? [...loaded, ...Array.from({ length: 3 - loaded.length }, () => ({}))]
+        : loaded
     } else {
-      // Pre-fill set rows from last session count, or use default
-      const rowCount = lastSession && lastSession.sets.length > 0
-        ? lastSession.sets.length
-        : DEFAULT_SET_COUNT
-      todaySets.value = Array.from({ length: rowCount }, () => ({}))
+      hasTodaySession.value = false
+      isSessionPersisted.value = false
+      todaySets.value = []
     }
   }
 
   // ---------------------------------------------------------------------------
-  // Mutation
+  // Start a new session: pre-fill from last session, enter edit mode.
+  // Session is NOT written to Firestore yet — that happens on first data entry.
+  // ---------------------------------------------------------------------------
+  function startSession(): void {
+    todaySets.value = lastSets.value.length > 0
+      ? lastSets.value.map((s) => ({ ...s }))
+      : Array.from({ length: 3 }, () => ({}))
+    hasTodaySession.value = true
+    isSessionPersisted.value = false
+  }
+
+  // ---------------------------------------------------------------------------
+  // Mutations
   // ---------------------------------------------------------------------------
   function updateSet(index: number, field: 'weight' | 'reps', value: number | null): void {
     const set = { ...todaySets.value[index] }
@@ -59,6 +81,33 @@ export function useSession(uid: string, exerciseId: string) {
   }
 
   // ---------------------------------------------------------------------------
+  // Delete today's session
+  // ---------------------------------------------------------------------------
+  async function deleteSession(): Promise<void> {
+    // Cancel any pending debounced save so it doesn't fire after deletion
+    if (saveTimer !== null) {
+      clearTimeout(saveTimer)
+      saveTimer = null
+    }
+
+    if (isSessionPersisted.value) {
+      try {
+        await deleteSessionService(uid, exerciseId, todayISO())
+      } catch (e) {
+        saveStatus.value = 'error'
+        saveError.value = 'Failed to delete. Check your connection.'
+        console.error(e)
+        return
+      }
+    }
+
+    hasTodaySession.value = false
+    isSessionPersisted.value = false
+    todaySets.value = []
+    saveStatus.value = 'idle'
+  }
+
+  // ---------------------------------------------------------------------------
   // Auto-save (2-second debounce)
   // ---------------------------------------------------------------------------
   function scheduleSave(): void {
@@ -69,14 +118,20 @@ export function useSession(uid: string, exerciseId: string) {
     }, 2000)
   }
 
+  /** Cancel any pending debounced save and persist immediately. Call on navigation away. */
+  function flushSave(): void {
+    if (saveTimer !== null) {
+      clearTimeout(saveTimer)
+      saveTimer = null
+      void persist()
+    }
+  }
+
   async function persist(): Promise<void> {
-    // Filter out empty rows before saving
     const validSets = todaySets.value.filter(
       (s): s is Set =>
         s.weight !== undefined &&
-        s.weight >= 0.5 &&
-        s.reps !== undefined &&
-        s.reps >= 1,
+        s.weight >= 0.5,
     )
 
     saveStatus.value = 'saving'
@@ -89,6 +144,7 @@ export function useSession(uid: string, exerciseId: string) {
         sets: validSets,
       })
       saveStatus.value = 'saved'
+      isSessionPersisted.value = true
     } catch (e) {
       saveStatus.value = 'error'
       saveError.value = 'Failed to save. Check your connection.'
@@ -96,24 +152,20 @@ export function useSession(uid: string, exerciseId: string) {
     }
   }
 
-  // Also trigger save when sets array length changes (add set)
-  watch(
-    () => todaySets.value.length,
-    () => {
-      if (todaySets.value.some((s) => s.weight !== undefined || s.reps !== undefined)) {
-        scheduleSave()
-      }
-    },
-  )
-
   return {
+    isLoading: isLoading as Ref<boolean>,
+    hasTodaySession: hasTodaySession as Ref<boolean>,
+    isSessionPersisted: isSessionPersisted as Ref<boolean>,
     todaySets: todaySets as Ref<Partial<Set>[]>,
     lastSets,
     lastSessionDate,
     saveStatus,
     saveError,
+    init,
+    flushSave,
+    startSession,
     updateSet,
     addSet,
-    init,
+    deleteSession,
   }
 }
