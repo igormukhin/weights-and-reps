@@ -5,7 +5,7 @@
   >
     <!-- Drag handle -->
     <template #prepend>
-      <v-icon class="drag-handle mr-2 text-medium-emphasis" icon="mdi-drag" />
+      <v-icon class="drag-handle mr-1 text-medium-emphasis" icon="mdi-drag" />
     </template>
 
     <!-- Exercise name — tap to navigate -->
@@ -22,7 +22,6 @@
         icon="mdi-pencil-outline"
         size="small"
         variant="text"
-        class="mr-1"
         @click.stop="showEdit = true"
       />
       <v-btn
@@ -73,5 +72,23 @@ const showHide = ref(false)
 }
 .drag-handle {
   cursor: grab;
+}
+
+.exercise-item :deep(.v-list-item__prepend) {
+  padding-inline-end: 0;
+}
+
+.exercise-item :deep(.v-list-item__prepend) {
+  --v-list-prepend-gap: 8px;
+}
+
+.exercise-item :deep(.v-list-item__append) {
+  padding-inline-start: 0;
+  gap: 0;
+}
+
+.exercise-item :deep(.v-list-item__append .v-btn) {
+  width: 32px;
+  height: 32px;
 }
 </style>
