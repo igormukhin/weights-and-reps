@@ -134,6 +134,24 @@ export function useSession(uid: string, exerciseId: string) {
         s.weight >= 0.5,
     )
 
+    // All inputs empty — delete persisted session, or skip if not yet saved
+    if (validSets.length === 0) {
+      if (isSessionPersisted.value) {
+        saveStatus.value = 'saving'
+        saveError.value = null
+        try {
+          await deleteSessionService(uid, exerciseId, todayISO())
+          isSessionPersisted.value = false
+          saveStatus.value = 'saved'
+        } catch (e) {
+          saveStatus.value = 'error'
+          saveError.value = 'Failed to save. Check your connection.'
+          console.error(e)
+        }
+      }
+      return
+    }
+
     saveStatus.value = 'saving'
     saveError.value = null
 
