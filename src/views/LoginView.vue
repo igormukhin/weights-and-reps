@@ -37,8 +37,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { signInWithGoogle } from '@/services/auth'
 
+const router = useRouter()
 const loading = ref(false)
 const error = ref<string | null>(null)
 
@@ -47,7 +49,7 @@ async function handleSignIn(): Promise<void> {
   error.value = null
   try {
     await signInWithGoogle()
-    // Router guard in App.vue / router will redirect to /exercises on auth state change
+    router.push('/exercises')
   } catch (e) {
     error.value = 'Sign in failed. Please try again.'
     console.error(e)
