@@ -53,7 +53,7 @@
           density="compact"
           variant="outlined"
           hide-details
-          class="flex-grow-1"
+          class="flex-grow-1 reps-field"
           style="min-width: 2ch"
           min="1"
           step="1"
@@ -125,5 +125,14 @@ function adjustReps(delta: number): void {
 <style scoped>
 .set-row {
   min-height: 56px;
+}
+
+.set-row :deep(.v-field) {
+  --v-field-padding-start: 8px;
+  --v-field-padding-end: 8px;
+}
+
+.reps-field :deep(input) {
+  text-align: right;
 }
 </style>

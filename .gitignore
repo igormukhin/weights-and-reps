@@ -4,6 +4,7 @@
 .ai/
 .specify/
 .claude/
+.firebase/
 
 # Node
 node_modules/

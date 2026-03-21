@@ -40,7 +40,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(set, index) in lastSets" :key="index" class="text-body-2">
+            <tr v-for="(set, index) in lastSets" :key="index" class="text-body-1">
               <td class="pr-6 text-medium-emphasis py-1">{{ index + 1 }}</td>
               <td class="pr-6 text-right py-1">{{ set.weight.toFixed(1) }} kg</td>
               <td class="text-right py-1">{{ set.reps }}</td>
