@@ -8,15 +8,20 @@
 
   <v-main>
     <v-container>
+      <!-- Loading state -->
+      <div v-if="isLoading" class="d-flex justify-center mt-8">
+        <v-progress-circular indeterminate color="primary" />
+      </div>
+
       <!-- Empty state -->
-      <div v-if="exercises.length === 0" class="text-center mt-12">
+      <div v-else-if="exercises.length === 0" class="text-center mt-12">
         <v-icon size="64" color="medium-emphasis">mdi-dumbbell</v-icon>
         <p class="text-h6 mt-4 text-medium-emphasis">No exercises yet</p>
         <p class="text-body-2 text-medium-emphasis">Tap + to add your first exercise</p>
       </div>
 
       <!-- Draggable exercise list -->
-      <v-list v-else lines="one" class="pa-0">
+      <v-list v-else-if="exercises.length > 0" lines="one" class="pa-0">
         <draggable
           v-model="exercises"
           item-key="id"
@@ -51,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import draggable from 'vuedraggable'
 import { useAuthStore } from '@/stores/auth'
@@ -68,6 +73,7 @@ const router = useRouter()
 const uid = authStore.currentUser!.uid
 const { reorder } = useExercises(uid)
 
+const isLoading = computed(() => exercisesStore.isLoading)
 const exercises = ref([...exercisesStore.exercises])
 watch(() => exercisesStore.exercises, (val) => { exercises.value = [...val] })
 const showAddDialog = ref(false)
