@@ -83,6 +83,7 @@
           :new-weight="set.weight"
           :new-reps="set.reps"
           :bump-it="set.bumpIt"
+          :weight-step="weightStep"
           :prev-new-weight="index > 0 ? todaySets[index - 1]?.weight : undefined"
           :prev-new-reps="index > 0 ? todaySets[index - 1]?.reps : undefined"
           @update:new-weight="(v) => updateSet(index, 'weight', v)"
@@ -147,6 +148,12 @@ const exerciseId = route.params.id as string
 const uid = authStore.currentUser!.uid
 
 const exercise = computed(() => exercisesStore.getById(exerciseId))
+
+const isDumbbell = computed(() => {
+  const name = exercise.value?.name.toLowerCase() ?? ''
+  return name.includes('dumbbell') || name.includes('kurzhantel')
+})
+const weightStep = computed(() => isDumbbell.value ? 2 : 2.5)
 
 const {
   isLoading,

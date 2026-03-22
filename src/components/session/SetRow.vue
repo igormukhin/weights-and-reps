@@ -13,7 +13,7 @@
           size="small"
           variant="text"
           :disabled="!newWeight"
-          @click="adjustWeight(-2.5)"
+          @click="adjustWeight(-step)"
         />
         <v-text-field
           :model-value="newWeight ?? ''"
@@ -24,7 +24,7 @@
           class="flex-grow-1"
           style="min-width: 4ch"
           min="0.5"
-          step="2.5"
+          :step="step"
           @focus="onWeightFocus"
           @update:model-value="onWeightInput"
         />
@@ -32,7 +32,7 @@
           icon="mdi-plus"
           size="small"
           variant="text"
-          @click="adjustWeight(2.5)"
+          @click="adjustWeight(step)"
         />
       </div>
     </v-col>
@@ -81,11 +81,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 const props = defineProps<{
   setNumber: number
   newWeight?: number
   newReps?: number
   bumpIt?: boolean
+  weightStep?: number
   /** New weight from the set immediately above this one (for prefill). */
   prevNewWeight?: number
   /** New reps from the set immediately above this one (for prefill). */
@@ -125,6 +128,8 @@ function adjustWeight(delta: number): void {
   const next = Math.max(0.5, Math.round((current + delta) * 10) / 10)
   emit('update:newWeight', next)
 }
+
+const step = computed(() => props.weightStep ?? 2.5)
 
 function adjustReps(delta: number): void {
   const current = props.newReps ?? 0
