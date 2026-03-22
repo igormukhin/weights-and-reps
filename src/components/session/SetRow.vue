@@ -6,7 +6,7 @@
     </v-col>
 
     <!-- New weight -->
-    <v-col cols="6" class="px-1">
+    <v-col cols="5" class="px-1">
       <div class="d-flex align-center">
         <v-btn
           icon="mdi-minus"
@@ -35,6 +35,15 @@
           @click="adjustWeight(2.5)"
         />
       </div>
+    </v-col>
+
+    <!-- BumpIt label toggle -->
+    <v-col cols="1" class="d-flex align-center justify-center">
+      <v-btn
+        variant="text"
+        :style="{ opacity: bumpIt ? 1 : 0.25 }"
+        @click="emit('update:bumpIt', !bumpIt)"
+      >🆙</v-btn>
     </v-col>
 
     <!-- New reps -->
@@ -76,6 +85,7 @@ const props = defineProps<{
   setNumber: number
   newWeight?: number
   newReps?: number
+  bumpIt?: boolean
   /** New weight from the set immediately above this one (for prefill). */
   prevNewWeight?: number
   /** New reps from the set immediately above this one (for prefill). */
@@ -85,6 +95,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:newWeight': [value: number | null]
   'update:newReps': [value: number | null]
+  'update:bumpIt': [value: boolean]
 }>()
 
 function onWeightFocus(): void {

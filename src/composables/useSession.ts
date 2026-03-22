@@ -80,6 +80,13 @@ export function useSession(uid: string, exerciseId: string) {
     todaySets.value.push({})
   }
 
+  function toggleBumpIt(index: number): void {
+    const set = { ...todaySets.value[index] }
+    set.bumpIt = !set.bumpIt
+    todaySets.value[index] = set
+    scheduleSave()
+  }
+
   // ---------------------------------------------------------------------------
   // Delete today's session
   // ---------------------------------------------------------------------------
@@ -184,6 +191,7 @@ export function useSession(uid: string, exerciseId: string) {
     startSession,
     updateSet,
     addSet,
+    toggleBumpIt,
     deleteSession,
   }
 }

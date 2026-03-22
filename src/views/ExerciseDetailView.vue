@@ -36,13 +36,15 @@
             <tr class="text-caption text-medium-emphasis">
               <th class="text-left pb-1 pr-6">#</th>
               <th class="text-right pb-1 pr-6">Weight</th>
+              <th class="pb-1 pr-6"></th>
               <th class="text-right pb-1">Reps</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(set, index) in lastSets" :key="index" class="text-body-1">
               <td class="pr-6 text-medium-emphasis py-1">{{ index + 1 }}</td>
-              <td class="pr-6 text-right py-1">{{ set.weight.toFixed(1) }} kg</td>
+              <td class="pr-6 text-right py-1">{{ set.weight.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) }} kg</td>
+              <td class="pr-6 py-1">{{ set.bumpIt ? '🆙' : '' }}</td>
               <td class="text-right py-1">{{ set.reps }}</td>
             </tr>
           </tbody>
@@ -66,7 +68,8 @@
         <!-- Column headers -->
         <v-row no-gutters class="mb-1 text-caption text-medium-emphasis">
           <v-col cols="1" class="text-center">#</v-col>
-          <v-col cols="6" class="text-center">kg</v-col>
+          <v-col cols="5" class="text-center">kg</v-col>
+          <v-col cols="1"></v-col>
           <v-col cols="5" class="text-center">Reps</v-col>
         </v-row>
 
@@ -79,10 +82,12 @@
           :set-number="index + 1"
           :new-weight="set.weight"
           :new-reps="set.reps"
+          :bump-it="set.bumpIt"
           :prev-new-weight="index > 0 ? todaySets[index - 1]?.weight : undefined"
           :prev-new-reps="index > 0 ? todaySets[index - 1]?.reps : undefined"
           @update:new-weight="(v) => updateSet(index, 'weight', v)"
           @update:new-reps="(v) => updateSet(index, 'reps', v)"
+          @update:bump-it="() => toggleBumpIt(index)"
         />
 
         <AddSetButton @add-set="addSet" />
@@ -157,6 +162,7 @@ const {
   startSession,
   updateSet,
   addSet,
+  toggleBumpIt,
   deleteSession,
 } = useSession(uid, exerciseId)
 
