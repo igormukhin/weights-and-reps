@@ -7,11 +7,13 @@
 
     <!-- New weight -->
     <v-col cols="5" class="px-1">
-      <div class="d-flex align-center">
+      <div class="d-flex align-center" @focusout="onWeightGroupFocusOut">
         <v-btn
           icon="mdi-minus"
           size="small"
           variant="text"
+          :class="{ 'adj-btn--hidden': !weightFocused }"
+          class="adj-btn"
           :disabled="!newWeight"
           @click="adjustWeight(-step)"
         />
@@ -32,6 +34,8 @@
           icon="mdi-plus"
           size="small"
           variant="text"
+          :class="{ 'adj-btn--hidden': !weightFocused }"
+          class="adj-btn"
           @click="adjustWeight(step)"
         />
       </div>
@@ -48,11 +52,13 @@
 
     <!-- New reps -->
     <v-col cols="5" class="px-1">
-      <div class="d-flex align-center">
+      <div class="d-flex align-center" @focusout="onRepsGroupFocusOut">
         <v-btn
           icon="mdi-minus"
           size="small"
           variant="text"
+          :class="{ 'adj-btn--hidden': !repsFocused }"
+          class="adj-btn"
           :disabled="!newReps"
           @click="adjustReps(-1)"
         />
@@ -73,6 +79,8 @@
           icon="mdi-plus"
           size="small"
           variant="text"
+          :class="{ 'adj-btn--hidden': !repsFocused }"
+          class="adj-btn"
           @click="adjustReps(1)"
         />
       </div>
@@ -81,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps<{
   setNumber: number
@@ -101,16 +109,37 @@ const emit = defineEmits<{
   'update:bumpIt': [value: boolean]
 }>()
 
+const weightFocused = ref(false)
+const repsFocused = ref(false)
+let weightHideTimer: ReturnType<typeof setTimeout> | null = null
+let repsHideTimer: ReturnType<typeof setTimeout> | null = null
+
 function onWeightFocus(): void {
+  if (weightHideTimer) { clearTimeout(weightHideTimer); weightHideTimer = null }
+  weightFocused.value = true
+  repsFocused.value = false
   if (props.newWeight === undefined && props.prevNewWeight !== undefined) {
     emit('update:newWeight', props.prevNewWeight)
   }
 }
 
+function onWeightGroupFocusOut(e: FocusEvent): void {
+  if ((e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) return
+  weightHideTimer = setTimeout(() => { weightFocused.value = false }, 200)
+}
+
 function onRepsFocus(): void {
+  if (repsHideTimer) { clearTimeout(repsHideTimer); repsHideTimer = null }
+  repsFocused.value = true
+  weightFocused.value = false
   if (props.newReps === undefined && props.prevNewReps !== undefined) {
     emit('update:newReps', props.prevNewReps)
   }
+}
+
+function onRepsGroupFocusOut(e: FocusEvent): void {
+  if ((e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) return
+  repsHideTimer = setTimeout(() => { repsFocused.value = false }, 200)
 }
 
 function onWeightInput(value: string | number): void {
@@ -124,6 +153,7 @@ function onRepsInput(value: string | number): void {
 }
 
 function adjustWeight(delta: number): void {
+  if (weightHideTimer) { clearTimeout(weightHideTimer); weightHideTimer = null }
   const current = props.newWeight ?? 0
   const next = Math.max(0.5, Math.round((current + delta) * 10) / 10)
   emit('update:newWeight', next)
@@ -132,6 +162,7 @@ function adjustWeight(delta: number): void {
 const step = computed(() => props.weightStep ?? 2.5)
 
 function adjustReps(delta: number): void {
+  if (repsHideTimer) { clearTimeout(repsHideTimer); repsHideTimer = null }
   const current = props.newReps ?? 0
   const next = Math.max(1, current + delta)
   emit('update:newReps', next)
@@ -150,5 +181,14 @@ function adjustReps(delta: number): void {
 
 .reps-field :deep(input) {
   text-align: right;
+}
+
+.adj-btn {
+  transition: opacity 0.15s ease;
+}
+
+.adj-btn--hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 </style>
