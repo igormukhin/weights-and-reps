@@ -91,23 +91,33 @@
           @update:bump-it="() => toggleBumpIt(index)"
         />
 
-        <AddSetButton @add-set="addSet" />
-
-        <!-- Delete session button — shown once session is persisted or has unsaved data -->
-        <v-btn
-          v-if="showDeleteButton"
-          color="error"
-          variant="tonal"
-          block
-          class="mt-6"
-          @click="showDeleteDialog = true"
-        >
-          Delete
-        </v-btn>
-
       </template>
     </v-container>
   </v-main>
+
+  <!-- Add set FAB — only in edit mode -->
+  <v-btn
+    v-if="hasTodaySession"
+    color="primary"
+    icon="mdi-plus"
+    size="large"
+    position="fixed"
+    location="bottom right"
+    class="ma-4"
+    @click="addSet"
+  />
+
+  <!-- Delete session FAB — shown once session is persisted or has unsaved data -->
+  <v-btn
+    v-if="showDeleteButton"
+    color="error"
+    icon="mdi-delete"
+    size="large"
+    position="fixed"
+    location="bottom left"
+    class="ma-4"
+    @click="showDeleteDialog = true"
+  />
 
   <!-- Save error snackbar -->
   <v-snackbar
@@ -136,7 +146,6 @@ import { useAuthStore } from '@/stores/auth'
 import { useExercisesStore } from '@/stores/exercises'
 import { useSession } from '@/composables/useSession'
 import SetRow from '@/components/session/SetRow.vue'
-import AddSetButton from '@/components/session/AddSetButton.vue'
 import DeleteSessionDialog from '@/components/session/DeleteSessionDialog.vue'
 
 const route = useRoute()
