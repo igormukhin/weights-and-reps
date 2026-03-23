@@ -6,7 +6,7 @@ import type { Timestamp } from 'firebase/firestore'
 
 /** A single set within a training session. Embedded in Session.sets. */
 export interface Set {
-  /** Weight in kilograms. Minimum 0.5. Step: 2.5 kg. */
+  /** Weight in kilograms. Negative values represent assisted exercises. Step: 2.5 kg. */
   weight: number
   /** Number of repetitions. Minimum 1. Step: 1. Optional — a set with weight only is valid. */
   reps?: number

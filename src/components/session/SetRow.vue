@@ -14,7 +14,7 @@
           variant="text"
           :class="{ 'adj-btn--hidden': !weightFocused }"
           class="adj-btn"
-          :disabled="!newWeight"
+          :disabled="newWeight == null"
           @click="adjustWeight(-step)"
         />
         <v-text-field
@@ -25,7 +25,6 @@
           hide-details
           class="flex-grow-1"
           style="min-width: 4ch"
-          min="0.5"
           :step="step"
           @focus="onWeightFocus"
           @update:model-value="onWeightInput"
@@ -155,7 +154,7 @@ function onRepsInput(value: string | number): void {
 function adjustWeight(delta: number): void {
   if (weightHideTimer) { clearTimeout(weightHideTimer); weightHideTimer = null }
   const current = props.newWeight ?? 0
-  const next = Math.max(0.5, Math.round((current + delta) * 10) / 10)
+  const next = Math.round((current + delta) * 10) / 10
   emit('update:newWeight', next)
 }
 

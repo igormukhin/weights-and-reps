@@ -136,9 +136,7 @@ export function useSession(uid: string, exerciseId: string) {
 
   async function persist(): Promise<void> {
     const validSets = todaySets.value.filter(
-      (s): s is Set =>
-        s.weight !== undefined &&
-        s.weight >= 0.5,
+      (s): s is Set => s.weight !== undefined,
     )
 
     // All inputs empty — delete persisted session, or skip if not yet saved
