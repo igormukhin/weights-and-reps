@@ -6,6 +6,7 @@ import {
   hideExercise as hideExerciseService,
   updatePositions,
 } from '@/services/exercises'
+import { findInsertPosition } from '@/utils/exercisePosition'
 
 export function useExercises(uid: string) {
   const store = useExercisesStore()
@@ -19,26 +20,6 @@ export function useExercises(uid: string) {
     return store.exercises.some(
       (e) => e.name.toLowerCase() === normalised && e.id !== excludeId,
     )
-  }
-
-  /**
-   * Find the insertion position for a new exercise using longest prefix match.
-   * Returns the position value the new exercise should receive.
-   */
-  function findInsertPosition(newName: string): number {
-    const lower = newName.trim().toLowerCase()
-    let bestMatchLength = 0
-    let insertAfterPosition = 0
-
-    for (const ex of store.exercises) {
-      const exLower = ex.name.toLowerCase()
-      if (lower.startsWith(exLower) && exLower.length > bestMatchLength) {
-        bestMatchLength = exLower.length
-        insertAfterPosition = ex.position
-      }
-    }
-
-    return insertAfterPosition + 1
   }
 
   /**
@@ -63,7 +44,7 @@ export function useExercises(uid: string) {
     if (!trimmed) return { error: 'Exercise name is required.' }
     if (isDuplicateName(trimmed)) return { error: 'An exercise with this name already exists.' }
 
-    const insertAt = findInsertPosition(trimmed)
+    const insertAt = findInsertPosition(store.exercises, trimmed)
 
     // Shift all exercises at or after insertAt position up by 1
     const shifted = store.exercises.map((e) =>
