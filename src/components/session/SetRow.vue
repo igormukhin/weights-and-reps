@@ -6,7 +6,7 @@
     </v-col>
 
     <!-- New weight -->
-    <v-col cols="6" class="px-1">
+    <v-col cols="5" class="px-1">
       <div class="d-flex align-center" @focusout="onWeightGroupFocusOut">
         <v-btn
           icon="mdi-minus"
@@ -50,7 +50,7 @@
     </v-col>
 
     <!-- New reps -->
-    <v-col cols="4" class="px-1">
+    <v-col cols="5" class="px-1">
       <div class="d-flex align-center" @focusout="onRepsGroupFocusOut">
         <v-btn
           icon="mdi-minus"
