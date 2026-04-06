@@ -8,8 +8,11 @@ import {
   deleteSession as deleteSessionService,
 } from '@/services/sessions'
 import { todayISO, formatGermanDate } from '@/utils/date'
+import { useSessionStore } from '@/stores/session'
 
 export function useSession(uid: string, exerciseId: string) {
+  const sessionStore = useSessionStore()
+
   const isLoading = ref(true)
   const hasTodaySession = ref(false)
   const isSessionPersisted = ref(false)
@@ -22,10 +25,38 @@ export function useSession(uid: string, exerciseId: string) {
   let saveTimer: ReturnType<typeof setTimeout> | null = null
 
   // ---------------------------------------------------------------------------
+  // Cache sync
+  // ---------------------------------------------------------------------------
+  function syncToCache(): void {
+    sessionStore.set(exerciseId, {
+      date: todayISO(),
+      hasTodaySession: hasTodaySession.value,
+      isSessionPersisted: isSessionPersisted.value,
+      todaySets: todaySets.value.map((s) => ({ ...s })),
+      lastSets: lastSets.value,
+      lastSessionDate: lastSessionDate.value,
+    })
+  }
+
+  // ---------------------------------------------------------------------------
   // Init: load today's session and last session on mount
   // ---------------------------------------------------------------------------
   async function init(): Promise<void> {
     const today = todayISO()
+
+    // Serve from cache if available (same calendar day)
+    const cached = sessionStore.get(exerciseId, today)
+    if (cached) {
+      hasTodaySession.value = cached.hasTodaySession
+      isSessionPersisted.value = cached.isSessionPersisted
+      todaySets.value = cached.todaySets.map((s) => ({ ...s }))
+      lastSets.value = cached.lastSets
+      lastSessionDate.value = cached.lastSessionDate
+      isLoading.value = false
+      return
+    }
+
+    // Cache miss — fetch from Firestore
     const [todaySession, lastSession] = await Promise.all([
       getTodaySession(uid, exerciseId, today),
       getLastSession(uid, exerciseId, today),
@@ -48,6 +79,8 @@ export function useSession(uid: string, exerciseId: string) {
       isSessionPersisted.value = false
       todaySets.value = []
     }
+
+    syncToCache()
   }
 
   // ---------------------------------------------------------------------------
@@ -60,6 +93,7 @@ export function useSession(uid: string, exerciseId: string) {
       : Array.from({ length: 3 }, () => ({}))
     hasTodaySession.value = true
     isSessionPersisted.value = false
+    syncToCache()
   }
 
   // ---------------------------------------------------------------------------
@@ -73,17 +107,20 @@ export function useSession(uid: string, exerciseId: string) {
       set[field] = value
     }
     todaySets.value[index] = set
+    syncToCache()
     scheduleSave()
   }
 
   function addSet(): void {
     todaySets.value.push({})
+    syncToCache()
   }
 
   function toggleBumpIt(index: number): void {
     const set = { ...todaySets.value[index] }
     set.bumpIt = !set.bumpIt
     todaySets.value[index] = set
+    syncToCache()
     scheduleSave()
   }
 
@@ -112,6 +149,7 @@ export function useSession(uid: string, exerciseId: string) {
     isSessionPersisted.value = false
     todaySets.value = []
     saveStatus.value = 'idle'
+    syncToCache()
   }
 
   // ---------------------------------------------------------------------------
@@ -148,6 +186,7 @@ export function useSession(uid: string, exerciseId: string) {
           await deleteSessionService(uid, exerciseId, todayISO())
           isSessionPersisted.value = false
           saveStatus.value = 'saved'
+          syncToCache()
         } catch (e) {
           saveStatus.value = 'error'
           saveError.value = 'Failed to save. Check your connection.'
@@ -168,6 +207,7 @@ export function useSession(uid: string, exerciseId: string) {
       })
       saveStatus.value = 'saved'
       isSessionPersisted.value = true
+      syncToCache()
     } catch (e) {
       saveStatus.value = 'error'
       saveError.value = 'Failed to save. Check your connection.'
