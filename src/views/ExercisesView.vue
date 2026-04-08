@@ -48,6 +48,7 @@
     position="fixed"
     location="bottom right"
     class="ma-4"
+    data-testid="add-exercise-fab"
     @click="showAddDialog = true"
   />
 

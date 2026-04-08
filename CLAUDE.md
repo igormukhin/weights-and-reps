@@ -8,6 +8,8 @@ Auto-generated from all feature plans. Last updated: 2026-04-08
 - Firestore — `users/{uid}/exercises/{exerciseId}/sessions/{YYYY-MM-DD}` (embedded `sets[]` array) (003-set-bump-label)
 - TypeScript 5.x (strict mode) + Vue 3 (Composition API), Vuetify 3, vuedraggable (004-exercise-edit-mode)
 - N/A (no data model changes) (004-exercise-edit-mode)
+- TypeScript 5.6 (strict mode) + Vue 3, Vuetify 3, Vite 6, Firebase SDK v10, Playwright (new), firebase-tools (new, dev) (005-e2e-test-setup)
+- Firebase Firestore via emulator in tests (005-e2e-test-setup)
 
 - TypeScript 5.x (strict mode) + Vue 3 (Composition API), Vuetify 3, Vue Router 4, Pinia, (001-training-tracker-app)
 
@@ -37,9 +39,9 @@ npm run lint    # ESLint + TypeScript check
 TypeScript 5.x (strict mode): Follow standard conventions
 
 ## Recent Changes
+- 005-e2e-test-setup: Added TypeScript 5.6 (strict mode) + Vue 3, Vuetify 3, Vite 6, Firebase SDK v10, Playwright (new), firebase-tools (new, dev)
+- 005-e2e-test-setup: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 004-exercise-edit-mode: Added TypeScript 5.x (strict mode) + Vue 3 (Composition API), Vuetify 3, vuedraggable
-- 003-set-bump-label: Added TypeScript 5.x (strict mode) + Vue 3 (Composition API), Vuetify 3, Pinia, Firebase SDK v10+
-- 002-exercise-detail-redesign: Added TypeScript 5.x (strict mode) + Vue 3 (Composition API), Vuetify 3, Pinia, Firebase SDK v10+
 
 
 <!-- MANUAL ADDITIONS START -->
