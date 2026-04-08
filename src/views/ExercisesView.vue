@@ -1,7 +1,8 @@
 <template>
   <v-app-bar color="primary" density="comfortable">
-    <v-app-bar-title>Weights &amp; Reps</v-app-bar-title>
+    <v-app-bar-title>{{ isEditMode ? 'Edit Exercises' : 'Weights &amp; Reps' }}</v-app-bar-title>
     <template #append>
+      <v-btn variant="text" @click="isEditMode = !isEditMode">{{ isEditMode ? 'Done' : 'Edit' }}</v-btn>
       <v-btn icon="mdi-logout" @click="handleSignOut" />
     </template>
   </v-app-bar>
@@ -17,7 +18,7 @@
       <div v-else-if="exercises.length === 0" class="text-center mt-12">
         <v-icon size="64" color="medium-emphasis">mdi-dumbbell</v-icon>
         <p class="text-h6 mt-4 text-medium-emphasis">No exercises yet</p>
-        <p class="text-body-2 text-medium-emphasis">Tap + to add your first exercise</p>
+        <p class="text-body-2 text-medium-emphasis">Tap Edit to add your first exercise</p>
       </div>
 
       <!-- Draggable exercise list -->
@@ -30,7 +31,7 @@
         >
           <template #item="{ element }">
             <div>
-              <ExerciseListItem :exercise="element" />
+              <ExerciseListItem :exercise="element" :is-edit-mode="isEditMode" />
             </div>
           </template>
         </draggable>
@@ -38,8 +39,9 @@
     </v-container>
   </v-main>
 
-  <!-- Add exercise FAB -->
+  <!-- Add exercise FAB (edit mode only) -->
   <v-btn
+    v-show="isEditMode"
     color="primary"
     icon="mdi-plus"
     size="large"
@@ -79,6 +81,7 @@ const isLoading = computed(() => exercisesStore.isLoading)
 const exercises = ref([...exercisesStore.exercises])
 watch(() => exercisesStore.exercises, (val) => { exercises.value = [...val] })
 const showAddDialog = ref(false)
+const isEditMode = ref<boolean>(false)
 
 onMounted(async () => {
   await exercisesStore.loadExercises(uid)

@@ -5,26 +5,28 @@
   >
     <!-- Drag handle -->
     <template #prepend>
-      <v-icon class="drag-handle mr-1 text-medium-emphasis" icon="mdi-drag" />
+      <v-icon v-show="isEditMode" class="drag-handle mr-1 text-medium-emphasis" icon="mdi-drag" />
     </template>
 
-    <!-- Exercise name — tap to navigate -->
+    <!-- Exercise name — tap to navigate (disabled in edit mode) -->
     <v-list-item-title
       class="exercise-name"
-      @click="router.push(`/exercises/${exercise.id}`)"
+      @click="!isEditMode && router.push(`/exercises/${exercise.id}`)"
     >
       {{ exercise.name }}
     </v-list-item-title>
 
-    <!-- Action buttons -->
+    <!-- Action buttons (edit mode only) -->
     <template #append>
       <v-btn
+        v-show="isEditMode"
         icon="mdi-pencil-outline"
         size="small"
         variant="text"
         @click.stop="showEdit = true"
       />
       <v-btn
+        v-show="isEditMode"
         icon="mdi-eye-off-outline"
         size="small"
         variant="text"
@@ -55,7 +57,7 @@ import type { Exercise } from '@/types'
 import EditExerciseDialog from './EditExerciseDialog.vue'
 import HideExerciseDialog from './HideExerciseDialog.vue'
 
-defineProps<{ exercise: Exercise }>()
+defineProps<{ exercise: Exercise; isEditMode: boolean }>()
 
 const router = useRouter()
 const showEdit = ref(false)
