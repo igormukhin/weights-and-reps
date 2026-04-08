@@ -71,6 +71,11 @@ const showHide = ref(false)
 }
 .exercise-name {
   cursor: pointer;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .drag-handle {
   cursor: grab;
