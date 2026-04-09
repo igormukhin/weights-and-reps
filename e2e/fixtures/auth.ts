@@ -37,7 +37,18 @@ export async function signInAsTestUser(page: Page): Promise<void> {
     [TEST_USER.email, TEST_USER.password],
   )
 
-  // Auth state is now persisted — navigate to exercises (router guard will pass)
+  // Auth state is now persisted in localStorage. Navigate to /exercises —
+  // router guard will pass once Firebase restores the session from storage.
   await page.goto('/exercises')
   await page.waitForURL('/exercises')
+  // Firebase Auth restores currentUser asynchronously on page load.
+  // Wait until it's set before returning, so callers like seedExercise can use it.
+  await page.waitForFunction(
+    () => {
+      const auth = (window as unknown as Record<string, { currentUser: unknown }>).__e2eAuth
+      return auth?.currentUser != null
+    },
+    undefined,
+    { timeout: 10_000 },
+  )
 }

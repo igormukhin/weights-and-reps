@@ -4,6 +4,11 @@ import {
   persistentLocalCache,
   memoryLocalCache,
   connectFirestoreEmulator,
+  addDoc,
+  collection,
+  serverTimestamp,
+  getDocs,
+  deleteDoc,
 } from 'firebase/firestore'
 import { getAuth, connectAuthEmulator, signInWithEmailAndPassword } from 'firebase/auth'
 
@@ -31,4 +36,16 @@ if (useEmulator) {
   // Expose for E2E test automation — allows page.evaluate() to sign in programmatically
   ;(window as unknown as Record<string, unknown>).__e2eAuth = auth
   ;(window as unknown as Record<string, unknown>).__e2eSignIn = signInWithEmailAndPassword
+  // Expose for E2E fixture seeding — allows page.evaluate() to write Firestore documents
+  ;(window as unknown as Record<string, unknown>).__e2eDb = db
+  ;(window as unknown as Record<string, unknown>).__e2eAddDoc = addDoc
+  ;(window as unknown as Record<string, unknown>).__e2eCollection = collection
+  ;(window as unknown as Record<string, unknown>).__e2eServerTimestamp = serverTimestamp
+  const clearExercises = async (): Promise<void> => {
+    if (!auth.currentUser) return
+    const uid = auth.currentUser.uid
+    const snap = await getDocs(collection(db, 'users', uid, 'exercises'))
+    await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)))
+  }
+  ;(window as unknown as Record<string, unknown>).__e2eClearExercises = clearExercises
 }

@@ -1,8 +1,10 @@
+# Git worktrees
+.worktrees/
+
 # IDE / tooling
 .idea/
 .vscode/
 .ai/
-.specify/
 .claude/
 .firebase/
 

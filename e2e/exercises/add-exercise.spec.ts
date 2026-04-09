@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { signInAsTestUser } from '../fixtures/auth'
+import { clearExercises } from '../fixtures/exercises'
 
 // Selectors:
 //   Edit button:          role=button[name="Edit"]         (AppBar, toggles edit mode)
@@ -13,6 +14,16 @@ import { signInAsTestUser } from '../fixtures/auth'
 test.describe.configure({ mode: 'serial' })
 
 test.describe('Add exercise', () => {
+  test.beforeAll(async ({ browser }) => {
+    const page = await browser.newPage()
+    try {
+      await signInAsTestUser(page)
+      await clearExercises(page)
+    } finally {
+      await page.close()
+    }
+  })
+
   test.beforeEach(async ({ page }) => {
     await signInAsTestUser(page)
     // Should already be on /exercises after sign-in

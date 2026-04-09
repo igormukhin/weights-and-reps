@@ -23,6 +23,7 @@
         icon="mdi-pencil-outline"
         size="small"
         variant="text"
+        data-testid="rename-exercise-btn"
         @click.stop="showEdit = true"
       />
       <v-btn
@@ -30,6 +31,7 @@
         icon="mdi-eye-off-outline"
         size="small"
         variant="text"
+        data-testid="hide-exercise-btn"
         @click.stop="showHide = true"
       />
     </template>
