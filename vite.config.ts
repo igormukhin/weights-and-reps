@@ -16,6 +16,18 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-vue':      ['vue', 'vue-router', 'pinia'],
+          'vendor-vuetify':  ['vuetify'],
+          'vendor-firebase-core': ['firebase/app', 'firebase/auth'],
+          'vendor-firebase-db':   ['firebase/firestore'],
+        },
+      },
+    },
+  },
   test: {
     environment: 'node',
   },

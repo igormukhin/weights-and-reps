@@ -3,7 +3,7 @@
     <v-app-bar-title>{{ isEditMode ? 'Edit Exercises' : 'Weights &amp; Reps' }}</v-app-bar-title>
     <template #append>
       <v-btn variant="text" @click="isEditMode = !isEditMode">{{ isEditMode ? 'Done' : 'Edit' }}</v-btn>
-      <v-btn icon="mdi-logout" @click="handleSignOut" />
+      <v-btn :icon="mdiLogout" @click="handleSignOut" />
     </template>
   </v-app-bar>
 
@@ -16,7 +16,7 @@
 
       <!-- Empty state -->
       <div v-else-if="exercises.length === 0" class="text-center mt-12">
-        <v-icon size="64" color="medium-emphasis">mdi-dumbbell</v-icon>
+        <v-icon size="64" color="medium-emphasis" :icon="mdiDumbbell" />
         <p class="text-h6 mt-4 text-medium-emphasis">No exercises yet</p>
         <p class="text-body-2 text-medium-emphasis">Tap Edit to add your first exercise</p>
       </div>
@@ -43,7 +43,7 @@
   <v-btn
     v-show="isEditMode"
     color="primary"
-    icon="mdi-plus"
+    :icon="mdiPlus"
     size="large"
     position="fixed"
     location="bottom right"
@@ -60,6 +60,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { mdiDumbbell, mdiLogout, mdiPlus } from '@mdi/js'
 import { useRouter } from 'vue-router'
 import draggable from 'vuedraggable'
 import { useAuthStore } from '@/stores/auth'

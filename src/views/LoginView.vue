@@ -15,7 +15,7 @@
               size="large"
               block
               :loading="loading"
-              prepend-icon="mdi-google"
+              :prepend-icon="mdiGoogle"
               @click="handleSignIn"
             >
               Sign in with Google
@@ -37,6 +37,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { mdiGoogle } from '@mdi/js'
 import { useRouter } from 'vue-router'
 import { signInWithGoogle } from '@/services/auth'
 

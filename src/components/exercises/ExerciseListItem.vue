@@ -5,7 +5,7 @@
   >
     <!-- Drag handle -->
     <template #prepend>
-      <v-icon v-show="isEditMode" class="drag-handle mr-1 text-medium-emphasis" icon="mdi-drag" />
+      <v-icon v-show="isEditMode" class="drag-handle mr-1 text-medium-emphasis" :icon="mdiDrag" />
     </template>
 
     <!-- Exercise name — tap to navigate (disabled in edit mode) -->
@@ -20,7 +20,7 @@
     <template #append>
       <v-btn
         v-show="isEditMode"
-        icon="mdi-pencil-outline"
+        :icon="mdiPencilOutline"
         size="small"
         variant="text"
         data-testid="rename-exercise-btn"
@@ -28,7 +28,7 @@
       />
       <v-btn
         v-show="isEditMode"
-        icon="mdi-eye-off-outline"
+        :icon="mdiEyeOffOutline"
         size="small"
         variant="text"
         data-testid="hide-exercise-btn"
@@ -54,6 +54,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { mdiDrag, mdiEyeOffOutline, mdiPencilOutline } from '@mdi/js'
 import { useRouter } from 'vue-router'
 import type { Exercise } from '@/types'
 import EditExerciseDialog from './EditExerciseDialog.vue'

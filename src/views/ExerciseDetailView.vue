@@ -1,6 +1,6 @@
 <template>
   <v-app-bar color="primary" density="comfortable">
-    <v-btn icon="mdi-arrow-left" @click="router.back()" />
+    <v-btn :icon="mdiArrowLeft" @click="router.back()" />
     <v-app-bar-title>{{ exercise?.name ?? '' }}</v-app-bar-title>
     <template #append>
       <!-- Save status indicator -->
@@ -100,7 +100,7 @@
     v-if="hasTodaySession"
     data-testid="add-set-fab"
     color="primary"
-    icon="mdi-plus"
+    :icon="mdiPlus"
     size="large"
     position="fixed"
     location="bottom right"
@@ -113,7 +113,7 @@
     v-if="showDeleteButton"
     data-testid="delete-session-fab"
     color="error"
-    icon="mdi-delete"
+    :icon="mdiDelete"
     size="large"
     position="fixed"
     location="bottom left"
@@ -143,6 +143,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { mdiArrowLeft, mdiDelete, mdiPlus } from '@mdi/js'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useExercisesStore } from '@/stores/exercises'
