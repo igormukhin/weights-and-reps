@@ -9,6 +9,8 @@ import {
   serverTimestamp,
   getDocs,
   deleteDoc,
+  setDoc,
+  doc,
 } from 'firebase/firestore'
 import { getAuth, connectAuthEmulator, signInWithEmailAndPassword } from 'firebase/auth'
 
@@ -48,4 +50,15 @@ if (useEmulator) {
     await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)))
   }
   ;(window as unknown as Record<string, unknown>).__e2eClearExercises = clearExercises
+  ;(window as unknown as Record<string, unknown>).__e2eSetDoc = setDoc
+  ;(window as unknown as Record<string, unknown>).__e2eDoc = doc
+  const clearSessions = async (exerciseId: string): Promise<void> => {
+    if (!auth.currentUser) return
+    const uid = auth.currentUser.uid
+    const snap = await getDocs(
+      collection(db, 'users', uid, 'exercises', exerciseId, 'sessions'),
+    )
+    await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)))
+  }
+  ;(window as unknown as Record<string, unknown>).__e2eClearSessions = clearSessions
 }

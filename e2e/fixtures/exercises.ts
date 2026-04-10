@@ -28,24 +28,26 @@ export async function clearExercises(page: Page): Promise<void> {
 
 /**
  * Writes an exercise document directly into the Firestore emulator.
+ * Returns the new exercise document ID.
  *
  * Prerequisites: signInAsTestUser(page) must have been called first so that
  * (a) the Firebase SDK is initialised, (b) the window.__e2e* helpers are
  * available, and (c) auth.currentUser is set.
  */
-export async function seedExercise(page: Page, name: string, position: number): Promise<void> {
-  await page.evaluate(
+export async function seedExercise(page: Page, name: string, position: number): Promise<string> {
+  return await page.evaluate(
     async ([exerciseName, exercisePosition]) => {
       const w = window as unknown as WindowE2E
       const uid = w.__e2eAuth.currentUser?.uid
       if (!uid) throw new Error('seedExercise: no authenticated user — call signInAsTestUser first')
       const ref = w.__e2eCollection(w.__e2eDb, 'users', uid, 'exercises')
-      await w.__e2eAddDoc(ref, {
+      const docRef = await w.__e2eAddDoc(ref, {
         name: exerciseName,
         position: exercisePosition,
         hidden: false,
         createdAt: w.__e2eServerTimestamp(),
       })
+      return (docRef as { id: string }).id
     },
     [name, position] as [string, number],
   )

@@ -1,0 +1,63 @@
+import { test, expect } from '@playwright/test'
+import { signInAsTestUser } from '../fixtures/auth'
+import { clearExercises, seedExercise } from '../fixtures/exercises'
+import { clearSessions, navigateToExercise } from '../fixtures/sessions'
+
+// Selectors:
+//   Add set FAB:   [data-testid="add-set-fab"]
+//   Set rows:      .set-row
+//   Weight input:  first input inside a .set-row
+//   Saved chip:    text=Saved
+
+test.describe.configure({ mode: 'serial' })
+
+let exerciseId: string
+
+test.describe('Edit sets', () => {
+  test.beforeAll(async ({ browser }) => {
+    const page = await browser.newPage()
+    try {
+      await signInAsTestUser(page)
+      await clearExercises(page)
+      exerciseId = await seedExercise(page, 'Deadlift', 1)
+    } finally {
+      await page.close()
+    }
+  })
+
+  test.beforeEach(async ({ page }) => {
+    await signInAsTestUser(page)
+    // Clear sessions so each test starts in read-only mode with "Pump it!" visible
+    await clearSessions(page, exerciseId)
+    await navigateToExercise(page, exerciseId)
+    await page.getByRole('button', { name: 'Pump it!' }).click()
+    await expect(page.locator('.set-row').first()).toBeVisible()
+  })
+
+  test('add-set FAB adds a new row', async ({ page }) => {
+    const initialCount = await page.locator('.set-row').count()
+    await page.locator('[data-testid="add-set-fab"]').click()
+    await expect(page.locator('.set-row')).toHaveCount(initialCount + 1)
+  })
+
+  test('editing weight triggers save and shows "Saved" chip', async ({ page }) => {
+    const weightInput = page.locator('.set-row').nth(0).locator('input').nth(0)
+    await weightInput.fill('100')
+    await weightInput.blur()
+
+    // Auto-save has a 2-second debounce; wait up to 10s for the chip
+    await expect(page.getByText('Saved')).toBeVisible({ timeout: 10_000 })
+  })
+
+  test('edited weight persists after reload', async ({ page }) => {
+    const weightInput = page.locator('.set-row').nth(0).locator('input').nth(0)
+    await weightInput.fill('100')
+    await weightInput.blur()
+    await expect(page.getByText('Saved')).toBeVisible({ timeout: 10_000 })
+
+    await page.reload()
+    await page.waitForURL(`/exercises/${exerciseId}`)
+
+    await expect(page.locator('.set-row').nth(0).locator('input').nth(0)).toHaveValue(/100/)
+  })
+})

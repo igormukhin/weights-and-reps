@@ -98,6 +98,7 @@
   <!-- Add set FAB — only in edit mode -->
   <v-btn
     v-if="hasTodaySession"
+    data-testid="add-set-fab"
     color="primary"
     icon="mdi-plus"
     size="large"
@@ -110,6 +111,7 @@
   <!-- Delete session FAB — shown once session is persisted or has unsaved data -->
   <v-btn
     v-if="showDeleteButton"
+    data-testid="delete-session-fab"
     color="error"
     icon="mdi-delete"
     size="large"

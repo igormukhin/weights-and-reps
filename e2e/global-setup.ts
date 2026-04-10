@@ -26,6 +26,12 @@ async function createTestUser(): Promise<void> {
     }),
   })
   if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    const message = (body as { error?: { message?: string } }).error?.message ?? ''
+    // If the user already exists the credentials are correct and tests can proceed.
+    // This happens when the auth emulator was started with a different project ID
+    // than the one used by global-setup's delete endpoint.
+    if (message === 'EMAIL_EXISTS') return
     throw new Error(
       `[global-setup] Failed to create test user: ${res.status} ${res.statusText}`,
     )
