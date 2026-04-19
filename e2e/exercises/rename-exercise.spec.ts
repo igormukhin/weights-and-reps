@@ -43,6 +43,7 @@ test.describe('Rename exercise', () => {
 
   test('renamed exercise persists after page reload', async ({ page }) => {
     await page.reload()
+    await page.getByRole('button', { name: '(ungrouped)' }).click()
     await expect(page.locator('.exercise-name', { hasText: 'Romanian Deadlift' })).toBeVisible()
   })
 

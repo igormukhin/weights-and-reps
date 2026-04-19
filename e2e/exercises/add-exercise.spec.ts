@@ -49,7 +49,8 @@ test.describe('Add exercise', () => {
     // Relies on suite-level state: "Bench Press" was added in the previous test.
     // Serial mode (above) guarantees this test runs after the first.
     await page.reload()
-    // Wait for the exercise list to render (avoids networkidle which never fires due to Firestore WebSocket)
+    // Exercises without a colon land in (ungrouped) — expand it to see the item
+    await page.getByRole('button', { name: '(ungrouped)' }).click()
     await expect(page.locator('.exercise-name', { hasText: 'Bench Press' })).toBeVisible()
   })
 })

@@ -8,7 +8,7 @@
   </v-app-bar>
 
   <v-main>
-    <v-container>
+    <v-container class="pa-0">
       <div v-if="isLoading" class="d-flex justify-center mt-8">
         <v-progress-circular indeterminate color="primary" />
       </div>
@@ -19,13 +19,7 @@
         <p class="text-body-2 text-medium-emphasis">Tap Edit to add your first exercise</p>
       </div>
 
-      <v-list v-else lines="one" class="pa-0">
-        <ExerciseListItemView
-          v-for="exercise in exercises"
-          :key="exercise.id"
-          :exercise="exercise"
-        />
-      </v-list>
+      <ExerciseGroupedList v-else :exercises="exercises" />
     </v-container>
   </v-main>
 </template>
@@ -38,7 +32,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useExercisesStore } from '@/stores/exercises'
 import { useSessionStore } from '@/stores/session'
 import { signOut } from '@/services/auth'
-import ExerciseListItemView from '@/components/exercises/ExerciseListItemView.vue'
+import ExerciseGroupedList from '@/components/exercises/ExerciseGroupedList.vue'
 
 const authStore = useAuthStore()
 const exercisesStore = useExercisesStore()

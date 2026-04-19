@@ -48,6 +48,7 @@ test.describe('Reorder exercises', () => {
 
   test('reordered list persists after page reload', async ({ page }) => {
     await page.reload()
+    await page.getByRole('button', { name: '(ungrouped)' }).click()
 
     const names = page.locator('.exercise-name')
     await expect(names.nth(0)).toHaveText('Deadlift')

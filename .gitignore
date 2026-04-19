@@ -7,6 +7,7 @@
 .ai/
 .claude/
 .firebase/
+.superpowers/
 
 # Node
 node_modules/
