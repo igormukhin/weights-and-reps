@@ -17,6 +17,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/exercises/edit',
+      name: 'exercises-edit',
+      component: () => import('@/views/ExercisesEditView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/exercises/:id',
       name: 'exercise-detail',
       component: () => import('@/views/ExerciseDetailView.vue'),

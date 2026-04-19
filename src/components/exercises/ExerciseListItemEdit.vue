@@ -3,23 +3,16 @@
     class="exercise-item pa-0"
     :ripple="false"
   >
-    <!-- Drag handle -->
     <template #prepend>
-      <v-icon v-show="isEditMode" class="drag-handle mr-1 text-medium-emphasis" :icon="mdiDrag" />
+      <v-icon class="drag-handle mr-1 text-medium-emphasis" :icon="mdiDrag" />
     </template>
 
-    <!-- Exercise name — tap to navigate (disabled in edit mode) -->
-    <v-list-item-title
-      class="exercise-name"
-      @click="!isEditMode && router.push(`/exercises/${exercise.id}`)"
-    >
+    <v-list-item-title class="exercise-name">
       {{ exercise.name }}
     </v-list-item-title>
 
-    <!-- Action buttons (edit mode only) -->
     <template #append>
       <v-btn
-        v-show="isEditMode"
         :icon="mdiPencilOutline"
         size="small"
         variant="text"
@@ -27,7 +20,6 @@
         @click.stop="showEdit = true"
       />
       <v-btn
-        v-show="isEditMode"
         :icon="mdiEyeOffOutline"
         size="small"
         variant="text"
@@ -55,14 +47,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { mdiDrag, mdiEyeOffOutline, mdiPencilOutline } from '@mdi/js'
-import { useRouter } from 'vue-router'
 import type { Exercise } from '@/types'
 import EditExerciseDialog from './EditExerciseDialog.vue'
 import HideExerciseDialog from './HideExerciseDialog.vue'
 
-defineProps<{ exercise: Exercise; isEditMode: boolean }>()
+defineProps<{ exercise: Exercise }>()
 
-const router = useRouter()
 const showEdit = ref(false)
 const showHide = ref(false)
 </script>
@@ -73,7 +63,6 @@ const showHide = ref(false)
   min-height: 52px;
 }
 .exercise-name {
-  cursor: pointer;
   white-space: normal;
   display: -webkit-box;
   -webkit-line-clamp: 2;
