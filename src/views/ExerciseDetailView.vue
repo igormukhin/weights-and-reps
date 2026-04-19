@@ -95,19 +95,6 @@
     </v-container>
   </v-main>
 
-  <!-- Add set FAB — only in edit mode -->
-  <v-btn
-    v-if="hasTodaySession"
-    data-testid="add-set-fab"
-    color="primary"
-    :icon="mdiPlus"
-    size="large"
-    position="fixed"
-    location="bottom right"
-    class="ma-4"
-    @click="addSet"
-  />
-
   <!-- Delete session FAB — shown once session is persisted or has unsaved data -->
   <v-btn
     v-if="showDeleteButton"
@@ -143,7 +130,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
-import { mdiArrowLeft, mdiDelete, mdiPlus } from '@mdi/js'
+import { mdiArrowLeft, mdiDelete } from '@mdi/js'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useExercisesStore } from '@/stores/exercises'
@@ -180,7 +167,6 @@ const {
   flushSave,
   startSession,
   updateSet,
-  addSet,
   toggleBumpIt,
   deleteSession,
 } = useSession(uid, exerciseId)

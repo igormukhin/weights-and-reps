@@ -4,7 +4,6 @@ import { clearExercises, seedExercise } from '../fixtures/exercises'
 import { clearSessions, navigateToExercise } from '../fixtures/sessions'
 
 // Selectors:
-//   Add set FAB:   [data-testid="add-set-fab"]
 //   Set rows:      .set-row
 //   Weight input:  first input inside a .set-row
 //   Saved chip:    text=Saved
@@ -34,9 +33,10 @@ test.describe('Edit sets', () => {
     await expect(page.locator('.set-row').first()).toBeVisible()
   })
 
-  test('add-set FAB adds a new row', async ({ page }) => {
+  test('typing weight in the last row auto-appends an empty row', async ({ page }) => {
     const initialCount = await page.locator('.set-row').count()
-    await page.locator('[data-testid="add-set-fab"]').click()
+    const lastWeightInput = page.locator('.set-row').nth(initialCount - 1).locator('input').nth(0)
+    await lastWeightInput.fill('100')
     await expect(page.locator('.set-row')).toHaveCount(initialCount + 1)
   })
 

@@ -8,6 +8,7 @@ import {
   deleteSession as deleteSessionService,
 } from '@/services/sessions'
 import { todayISO, formatGermanDate } from '@/utils/date'
+import { enforceRowInvariants } from '@/utils/setRowInvariants'
 import { useSessionStore } from '@/stores/session'
 
 export function useSession(uid: string, exerciseId: string) {
@@ -52,6 +53,10 @@ export function useSession(uid: string, exerciseId: string) {
       todaySets.value = cached.todaySets.map((s) => ({ ...s }))
       lastSets.value = cached.lastSets
       lastSessionDate.value = cached.lastSessionDate
+      if (hasTodaySession.value) {
+        enforceRowInvariants(todaySets.value)
+        syncToCache()
+      }
       isLoading.value = false
       return
     }
@@ -70,10 +75,8 @@ export function useSession(uid: string, exerciseId: string) {
     if (todaySession) {
       hasTodaySession.value = true
       isSessionPersisted.value = true
-      const loaded = todaySession.sets.map((s) => ({ ...s }))
-      todaySets.value = loaded.length < 3
-        ? [...loaded, ...Array.from({ length: 3 - loaded.length }, () => ({}))]
-        : loaded
+      todaySets.value = todaySession.sets.map((s) => ({ ...s }))
+      enforceRowInvariants(todaySets.value)
     } else {
       hasTodaySession.value = false
       isSessionPersisted.value = false
@@ -90,7 +93,8 @@ export function useSession(uid: string, exerciseId: string) {
   function startSession(): void {
     todaySets.value = lastSets.value.length > 0
       ? lastSets.value.map((s) => ({ ...s }))
-      : Array.from({ length: 3 }, () => ({}))
+      : []
+    enforceRowInvariants(todaySets.value)
     hasTodaySession.value = true
     isSessionPersisted.value = false
     syncToCache()
@@ -107,13 +111,9 @@ export function useSession(uid: string, exerciseId: string) {
       set[field] = value
     }
     todaySets.value[index] = set
+    enforceRowInvariants(todaySets.value)
     syncToCache()
     scheduleSave()
-  }
-
-  function addSet(): void {
-    todaySets.value.push({})
-    syncToCache()
   }
 
   function toggleBumpIt(index: number): void {
@@ -228,7 +228,6 @@ export function useSession(uid: string, exerciseId: string) {
     flushSave,
     startSession,
     updateSet,
-    addSet,
     toggleBumpIt,
     deleteSession,
   }
