@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels>
+  <v-expansion-panels v-model="openPanel">
     <v-expansion-panel
       v-for="group in groups"
       :key="group.name"
@@ -10,9 +10,10 @@
           <v-list-item
             v-for="exercise in group.exercises"
             :key="exercise.id"
-            class="exercise-item pa-0"
+            :ref="(el) => setItemRef(exercise.id, el)"
+            :class="['exercise-item', 'pa-0', { selected: exercise.id === exercisesStore.lastSelectedExerciseId }]"
             :ripple="false"
-            @click="router.push(`/exercises/${exercise.id}`)"
+            @click="selectExercise(exercise.id)"
           >
             <v-list-item-title class="exercise-name">
               {{ exercise.shortName }}
@@ -25,15 +26,55 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import type { ComponentPublicInstance } from 'vue'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import type { Exercise } from '@/types'
 import { groupExercises } from '@/utils/exerciseGroups'
+import { useExercisesStore } from '@/stores/exercises'
 
 const props = defineProps<{ exercises: Exercise[] }>()
 const router = useRouter()
+const exercisesStore = useExercisesStore()
 
 const groups = computed(() => groupExercises(props.exercises))
+
+const openPanel = ref<number | undefined>(undefined)
+watch(
+  groups,
+  (newGroups) => {
+    if (!newGroups.length) return
+    const idx = newGroups.findIndex((g) =>
+      g.exercises.some((e) => e.id === exercisesStore.lastSelectedExerciseId),
+    )
+    openPanel.value = idx >= 0 ? idx : undefined
+  },
+  { immediate: true, once: true },
+)
+
+const selectedItemEl = ref<ComponentPublicInstance | null>(null)
+
+function setItemRef(id: string, el: unknown): void {
+  if (id === exercisesStore.lastSelectedExerciseId) {
+    selectedItemEl.value = el as ComponentPublicInstance
+  }
+}
+
+function selectExercise(id: string): void {
+  exercisesStore.setLastSelected(id)
+  router.push(`/exercises/${id}`)
+}
+
+onMounted(async () => {
+  await nextTick()
+  selectedItemEl.value?.$el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+})
+
+onBeforeRouteLeave((to) => {
+  if (to.name !== 'exercise-detail') {
+    exercisesStore.clearLastSelected()
+  }
+})
 </script>
 
 <style scoped>
@@ -45,6 +86,10 @@ const groups = computed(() => groupExercises(props.exercises))
   border-radius: 0;
   font-weight: 700;
   background-color: rgb(var(--v-theme-surface-light));
+}
+:deep(.v-expansion-panel-text__wrapper) {
+  padding-left: 16px;
+  padding-right: 16px;
 }
 :deep(.v-expansion-panel-title__overlay) {
   background-color: unset;
@@ -59,6 +104,10 @@ const groups = computed(() => groupExercises(props.exercises))
 .exercise-item {
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   min-height: 52px;
+}
+.exercise-item.selected {
+  background: rgba(var(--v-theme-primary), 0.08);
+  border-right: 3px solid rgb(var(--v-theme-primary));
 }
 .exercise-name {
   cursor: pointer;

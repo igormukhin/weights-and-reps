@@ -2,7 +2,7 @@
   <v-app-bar color="primary" density="comfortable">
     <v-app-bar-title>Weights &amp; Reps</v-app-bar-title>
     <template #append>
-      <v-btn variant="text" @click="router.push('/exercises/edit')">Edit</v-btn>
+      <v-btn :icon="mdiPencil" @click="router.push('/exercises/edit')" />
       <v-btn :icon="mdiLogout" @click="handleSignOut" />
     </template>
   </v-app-bar>
@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { mdiDumbbell, mdiLogout } from '@mdi/js'
+import { mdiDumbbell, mdiLogout, mdiPencil } from '@mdi/js'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useExercisesStore } from '@/stores/exercises'
