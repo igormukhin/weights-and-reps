@@ -2,7 +2,7 @@
   <v-app-bar color="primary" density="comfortable">
     <v-app-bar-title>Weights &amp; Reps</v-app-bar-title>
     <template #append>
-      <v-btn :icon="mdiPencil" @click="router.push('/exercises/edit')" />
+      <v-btn :icon="mdiPencil" aria-label="Edit" @click="router.push('/exercises/edit')" />
       <v-btn :icon="mdiLogout" @click="handleSignOut" />
     </template>
   </v-app-bar>
