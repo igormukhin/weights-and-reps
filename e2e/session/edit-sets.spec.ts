@@ -4,9 +4,9 @@ import { clearExercises, seedExercise } from '../fixtures/exercises'
 import { clearSessions, navigateToExercise } from '../fixtures/sessions'
 
 // Selectors:
-//   Set rows:      .set-row
-//   Weight input:  first input inside a .set-row
-//   Saved chip:    text=Saved
+//   Set rows:        .set-row
+//   Weight input:    first input inside a .set-row
+//   Save complete:   [data-save-status="saved"]
 
 test.describe.configure({ mode: 'serial' })
 
@@ -40,20 +40,20 @@ test.describe('Edit sets', () => {
     await expect(page.locator('.set-row')).toHaveCount(initialCount + 1)
   })
 
-  test('editing weight triggers save and shows "Saved" chip', async ({ page }) => {
+  test('editing weight triggers auto-save', async ({ page }) => {
     const weightInput = page.locator('.set-row').nth(0).locator('input').nth(0)
     await weightInput.fill('100')
     await weightInput.blur()
 
-    // Auto-save has a 2-second debounce; wait up to 10s for the chip
-    await expect(page.getByText('Saved')).toBeVisible({ timeout: 10_000 })
+    // Auto-save has a 2-second debounce; wait up to 10s for save to complete
+    await expect(page.locator('[data-save-status="saved"]')).toBeAttached({ timeout: 10_000 })
   })
 
   test('edited weight persists after reload', async ({ page }) => {
     const weightInput = page.locator('.set-row').nth(0).locator('input').nth(0)
     await weightInput.fill('100')
     await weightInput.blur()
-    await expect(page.getByText('Saved')).toBeVisible({ timeout: 10_000 })
+    await expect(page.locator('[data-save-status="saved"]')).toBeAttached({ timeout: 10_000 })
 
     await page.reload()
     await page.waitForURL(`/exercises/${exerciseId}`)

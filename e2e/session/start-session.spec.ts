@@ -8,7 +8,7 @@ import { seedSession, clearSessions, navigateToExercise } from '../fixtures/sess
 //   Set rows:        .set-row
 //   Weight input:    .set-row >> nth=0 >> input >> nth=0
 //   Reps input:      .set-row >> nth=0 >> input >> nth=1
-//   Saved chip:      text=Saved
+//   Save complete:   [data-save-status="saved"]
 
 test.describe.configure({ mode: 'serial' })
 
@@ -75,7 +75,7 @@ test.describe('Start session', () => {
     await weightInput.blur()
 
     // Wait for auto-save (2-second debounce + write)
-    await expect(page.getByText('Saved')).toBeVisible({ timeout: 10_000 })
+    await expect(page.locator('[data-save-status="saved"]')).toBeAttached({ timeout: 10_000 })
 
     await page.reload()
     await page.waitForURL(`/exercises/${exerciseId}`)

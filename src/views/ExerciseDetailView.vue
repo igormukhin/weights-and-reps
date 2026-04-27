@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar color="primary" density="comfortable">
+  <v-app-bar color="primary" density="comfortable" :data-save-status="saveStatus">
     <v-btn :icon="mdiArrowLeft" @click="router.back()" />
     <v-app-bar-title>{{ exercise?.name ?? '' }}</v-app-bar-title>
     <template #append>

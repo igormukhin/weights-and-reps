@@ -6,7 +6,7 @@ import { clearSessions, navigateToExercise } from '../fixtures/sessions'
 // Selectors:
 //   BumpIt button:   button containing '🆙' inside .set-row
 //   Weight input:    first input in .set-row (needed to trigger save alongside bumpIt toggle)
-//   Saved chip:      text=Saved
+//   Save complete:   [data-save-status="saved"]
 
 test.describe.configure({ mode: 'serial' })
 
@@ -52,7 +52,7 @@ test.describe('BumpIt toggle', () => {
     const bumpItBtn = page.locator('.set-row').nth(0).getByRole('button', { name: '🆙' })
     await bumpItBtn.click()
 
-    await expect(page.getByText('Saved')).toBeVisible({ timeout: 10_000 })
+    await expect(page.locator('[data-save-status="saved"]')).toBeAttached({ timeout: 10_000 })
 
     await page.reload()
     await page.waitForURL(`/exercises/${exerciseId}`)
