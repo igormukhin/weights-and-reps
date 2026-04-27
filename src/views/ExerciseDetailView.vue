@@ -5,7 +5,7 @@
     <template #append>
       <!-- Save status indicator -->
       <v-chip
-        v-if="saveStatus !== 'idle'"
+        v-if="saveStatus === 'saving' || saveStatus === 'error'"
         :color="statusColor"
         size="small"
         class="mr-2"
@@ -13,8 +13,21 @@
       >
         {{ statusLabel }}
       </v-chip>
+      <!-- Rename exercise button -->
+      <v-btn
+        :icon="mdiPencil"
+        aria-label="Rename exercise"
+        @click="showRenameDialog = true"
+      />
     </template>
   </v-app-bar>
+
+  <EditExerciseDialog
+    v-if="showRenameDialog && exercise"
+    :exercise-id="exerciseId"
+    :current-name="exercise.name"
+    @close="showRenameDialog = false"
+  />
 
   <v-main>
     <v-container>
@@ -130,13 +143,14 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
-import { mdiArrowLeft, mdiDelete } from '@mdi/js'
+import { mdiArrowLeft, mdiDelete, mdiPencil } from '@mdi/js'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useExercisesStore } from '@/stores/exercises'
 import { useSession } from '@/composables/useSession'
 import SetRow from '@/components/session/SetRow.vue'
 import DeleteSessionDialog from '@/components/session/DeleteSessionDialog.vue'
+import EditExerciseDialog from '@/components/exercises/EditExerciseDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -173,6 +187,7 @@ const {
 
 const showError = ref(false)
 const showDeleteDialog = ref(false)
+const showRenameDialog = ref(false)
 
 watch(saveError, (val) => {
   if (val) showError.value = true
@@ -185,14 +200,12 @@ const showDeleteButton = computed(() =>
 
 const statusColor = computed(() => {
   if (saveStatus.value === 'saving') return 'orange'
-  if (saveStatus.value === 'saved') return 'success'
   if (saveStatus.value === 'error') return 'error'
   return undefined
 })
 
 const statusLabel = computed(() => {
   if (saveStatus.value === 'saving') return 'Saving…'
-  if (saveStatus.value === 'saved') return 'Saved'
   if (saveStatus.value === 'error') return 'Error'
   return ''
 })
