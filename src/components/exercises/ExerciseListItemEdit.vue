@@ -33,7 +33,7 @@
     v-if="showEdit"
     :exercise-id="exercise.id"
     :current-name="exercise.name"
-    @close="showEdit = false"
+    @close="onEditClose"
   />
 
   <HideExerciseDialog
@@ -52,9 +52,15 @@ import EditExerciseDialog from './EditExerciseDialog.vue'
 import HideExerciseDialog from './HideExerciseDialog.vue'
 
 defineProps<{ exercise: Exercise }>()
+const emit = defineEmits<{ renamed: [id: string] }>()
 
 const showEdit = ref(false)
 const showHide = ref(false)
+
+function onEditClose(id?: string): void {
+  showEdit.value = false
+  if (id) emit('renamed', id)
+}
 </script>
 
 <style scoped>

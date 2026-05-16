@@ -28,7 +28,7 @@
         >
           <template #item="{ element }">
             <div>
-              <ExerciseListItemEdit :exercise="element" />
+              <ExerciseListItemEdit :exercise="element" @renamed="exercisesStore.setLastSelected" />
             </div>
           </template>
         </draggable>
@@ -90,9 +90,10 @@ async function handleSignOut(): Promise<void> {
   router.push('/login')
 }
 
-async function onAddDialogClose(): Promise<void> {
+async function onAddDialogClose(id?: string): Promise<void> {
   showAddDialog.value = false
   await exercisesStore.loadExercises(uid)
+  if (id) exercisesStore.setLastSelected(id)
 }
 
 async function onDragEnd(event: { newIndex: number; oldIndex: number }): Promise<void> {

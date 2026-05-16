@@ -39,7 +39,7 @@ export function useExercises(uid: string) {
   // Public API
   // ---------------------------------------------------------------------------
 
-  async function addExercise(name: string): Promise<{ error?: string }> {
+  async function addExercise(name: string): Promise<{ id?: string; error?: string }> {
     const trimmed = name.trim()
     if (!trimmed) return { error: 'Exercise name is required.' }
     if (isDuplicateName(trimmed)) return { error: 'An exercise with this name already exists.' }
@@ -65,7 +65,7 @@ export function useExercises(uid: string) {
 
     const merged = [...shifted, newEx].sort((a, b) => a.position - b.position)
     await reindexAndPersist(merged)
-    return {}
+    return { id }
   }
 
   async function renameExercise(id: string, newName: string): Promise<{ error?: string }> {

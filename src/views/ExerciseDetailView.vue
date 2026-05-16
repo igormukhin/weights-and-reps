@@ -32,6 +32,8 @@
   <v-main>
     <v-container>
 
+      <p v-if="exercise" class="text-subtitle-1 mb-4">{{ exercise.name }}</p>
+
       <!-- LOADING STATE -->
       <div v-if="isLoading" class="d-flex justify-center mt-8">
         <v-progress-circular indeterminate color="primary" />

@@ -25,7 +25,7 @@ import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useExercises } from '@/composables/useExercises'
 
-const emit = defineEmits<{ close: [] }>()
+const emit = defineEmits<{ close: [id?: string] }>()
 
 const authStore = useAuthStore()
 const { addExercise } = useExercises(authStore.currentUser!.uid)
@@ -42,7 +42,7 @@ async function submit(): Promise<void> {
     if (result.error) {
       errorMessage.value = result.error
     } else {
-      emit('close')
+      emit('close', result.id)
     }
   } catch (e) {
     errorMessage.value = 'Failed to save. Check your connection and permissions.'

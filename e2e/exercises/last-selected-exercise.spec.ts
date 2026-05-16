@@ -71,3 +71,106 @@ test.describe('Last selected exercise', () => {
     await expect(page.locator('.exercise-item.selected')).toContainText('Incline Press')
   })
 })
+
+test.describe('Last selected after adding exercise', () => {
+  test.beforeAll(async ({ browser }) => {
+    const page = await browser.newPage()
+    try {
+      await signInAsTestUser(page)
+      await clearExercises(page)
+      await seedExercise(page, 'Chest: Bench Press', 1)
+    } finally {
+      await page.close()
+    }
+  })
+
+  test.beforeEach(async ({ page }) => {
+    await signInAsTestUser(page)
+    await expect(page).toHaveURL('/exercises')
+  })
+
+  test('newly added exercise is highlighted on return to home', async ({ page }) => {
+    await page.getByRole('button', { name: 'Edit', exact: true }).click()
+    await page.waitForURL('/exercises/edit')
+
+    await page.locator('[data-testid="add-exercise-fab"]').click()
+    await page.getByLabel('Exercise name').fill('Chest: Cable Fly')
+    await page.getByRole('button', { name: 'Add' }).click()
+    await expect(page.getByLabel('Exercise name')).not.toBeVisible()
+
+    await page.getByRole('button', { name: 'Done' }).click()
+    await page.waitForURL('/exercises')
+
+    await expect(page.locator('.exercise-item.selected')).toHaveCount(1)
+    await expect(page.locator('.exercise-item.selected')).toContainText('Cable Fly')
+  })
+
+  test('no highlight when returning without adding', async ({ page }) => {
+    await page.getByRole('button', { name: 'Edit', exact: true }).click()
+    await page.waitForURL('/exercises/edit')
+
+    await page.getByRole('button', { name: 'Done' }).click()
+    await page.waitForURL('/exercises')
+
+    await expect(page.locator('.exercise-item.selected')).toHaveCount(0)
+  })
+})
+
+test.describe('Last selected after renaming exercise', () => {
+  test.beforeAll(async ({ browser }) => {
+    const page = await browser.newPage()
+    try {
+      await signInAsTestUser(page)
+      await clearExercises(page)
+      await seedExercise(page, 'Chest: Bench Press', 1)
+      await seedExercise(page, 'Chest: Incline Press', 2)
+    } finally {
+      await page.close()
+    }
+  })
+
+  test.beforeEach(async ({ page }) => {
+    await signInAsTestUser(page)
+    await expect(page).toHaveURL('/exercises')
+  })
+
+  test('renamed exercise is highlighted on return to home', async ({ page }) => {
+    await page.getByRole('button', { name: 'Edit', exact: true }).click()
+    await page.waitForURL('/exercises/edit')
+
+    await page.locator('[data-testid="rename-exercise-btn"]').first().click()
+    await page.getByLabel('Exercise name').clear()
+    await page.getByLabel('Exercise name').fill('Chest: Cable Fly')
+    await page.getByRole('button', { name: 'Save' }).click()
+    await expect(page.getByLabel('Exercise name')).not.toBeVisible()
+
+    await page.getByRole('button', { name: 'Done' }).click()
+    await page.waitForURL('/exercises')
+
+    await expect(page.locator('.exercise-item.selected')).toHaveCount(1)
+    await expect(page.locator('.exercise-item.selected')).toContainText('Cable Fly')
+  })
+
+  test('last renamed exercise wins when two are renamed', async ({ page }) => {
+    await page.getByRole('button', { name: 'Edit', exact: true }).click()
+    await page.waitForURL('/exercises/edit')
+
+    await page.locator('[data-testid="rename-exercise-btn"]').first().click()
+    await page.getByLabel('Exercise name').clear()
+    await page.getByLabel('Exercise name').fill('Chest: First Renamed')
+    await page.getByRole('button', { name: 'Save' }).click()
+    await expect(page.getByLabel('Exercise name')).not.toBeVisible()
+
+    await page.locator('[data-testid="rename-exercise-btn"]').last().click()
+    await page.getByLabel('Exercise name').clear()
+    await page.getByLabel('Exercise name').fill('Chest: Second Renamed')
+    await page.getByRole('button', { name: 'Save' }).click()
+    await expect(page.getByLabel('Exercise name')).not.toBeVisible()
+
+    await page.getByRole('button', { name: 'Done' }).click()
+    await page.waitForURL('/exercises')
+
+    await expect(page.locator('.exercise-item.selected')).toHaveCount(1)
+    await expect(page.locator('.exercise-item.selected')).toContainText('Second Renamed')
+  })
+})

@@ -30,7 +30,7 @@ const props = defineProps<{
   currentName: string
 }>()
 
-const emit = defineEmits<{ close: [] }>()
+const emit = defineEmits<{ close: [id?: string] }>()
 
 const authStore = useAuthStore()
 const { renameExercise } = useExercises(authStore.currentUser!.uid)
@@ -47,7 +47,7 @@ async function submit(): Promise<void> {
   if (result.error) {
     errorMessage.value = result.error
   } else {
-    emit('close')
+    emit('close', props.exerciseId)
   }
 }
 </script>

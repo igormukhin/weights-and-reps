@@ -46,3 +46,17 @@ TypeScript 5.x (strict mode): Follow standard conventions
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues (`igormukhin/weights-and-reps`). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Uses the five default label names (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context repo — one `CONTEXT.md` + `docs/adr/` at the root (neither exists yet; skills will proceed silently until created). See `docs/agents/domain.md`.
