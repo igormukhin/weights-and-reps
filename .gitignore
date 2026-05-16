@@ -33,5 +33,5 @@ npm-debug.log*
 Thumbs.db
 
 # AI
-.agents\skills
+.agents/
 skills-lock.json
