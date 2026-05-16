@@ -1,5 +1,5 @@
 > [!CAUTION]
-> The app is vibe coded with Claude Code (Sonnet 4.6) and SpecKit. I never looked at the code. 
+> The app is created with agentic coding. The human was not reviewing the code. 
 
 # Weights and Reps
 
