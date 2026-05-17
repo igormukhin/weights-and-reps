@@ -143,7 +143,7 @@ describe('enforceRowInvariants', () => {
     expect(sets).toEqual([{ weight: 100 }, { weight: 100 }, {}])
   })
 
-  it('handles a 5-row all-filled session by appending a trailing empty', () => {
+  it('handles a 5-row all-filled ExerciseLog by appending a trailing empty', () => {
     const sets: Partial<Set>[] = [
       { weight: 100 },
       { weight: 100 },

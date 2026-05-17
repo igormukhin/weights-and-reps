@@ -14,7 +14,7 @@ type WindowE2E = {
  * Prerequisites: signInAsTestUser(page) must have been called first.
  * Call this in beforeAll before seeding to ensure a clean slate.
  *
- * Note: does not delete sub-collections (e.g. sessions) — only top-level exercise docs.
+ * Note: does not delete sub-collections (e.g. exerciseLogs) — only top-level exercise docs.
  */
 export async function clearExercises(page: Page): Promise<void> {
   await page.evaluate(async () => {
@@ -44,7 +44,7 @@ export async function seedExercise(page: Page, name: string, position: number): 
       const docRef = await w.__e2eAddDoc(ref, {
         name: exerciseName,
         position: exercisePosition,
-        hidden: false,
+        archived: false,
         createdAt: w.__e2eServerTimestamp(),
       })
       return (docRef as { id: string }).id

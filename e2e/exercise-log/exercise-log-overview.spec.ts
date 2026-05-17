@@ -1,11 +1,11 @@
 import { test, expect } from '../fixtures'
 import { signInAsTestUser } from '../fixtures/auth'
 import { clearExercises, seedExercise } from '../fixtures/exercises'
-import { seedSession, clearSessions, navigateToExercise } from '../fixtures/sessions'
+import { seedExerciseLog, clearExerciseLogs, navigateToExercise } from '../fixtures/exerciseLogs'
 
 // Selectors:
 //   Last training date:  text matching 'Last training:' paragraph
-//   Set table rows:      table tbody tr  (read-only session table)
+//   Set table rows:      table tbody tr  (read-only ExerciseLog table)
 //   Pump it button:      role=button[name="Pump it!"]
 
 test.describe.configure({ mode: 'serial' })
@@ -18,15 +18,15 @@ const PAST_SETS = [
 
 let exerciseId: string
 
-test.describe('Session read-only mode', () => {
+test.describe('Overview mode', () => {
   test.beforeAll(async ({ browser }) => {
     const page = await browser.newPage()
     try {
       await signInAsTestUser(page)
       await clearExercises(page)
       exerciseId = await seedExercise(page, 'Bench Press', 1)
-      await clearSessions(page, exerciseId)
-      await seedSession(page, exerciseId, PAST_DATE, PAST_SETS)
+      await clearExerciseLogs(page, exerciseId)
+      await seedExerciseLog(page, exerciseId, PAST_DATE, PAST_SETS)
     } finally {
       await page.close()
     }
@@ -41,7 +41,7 @@ test.describe('Session read-only mode', () => {
     await expect(page.locator('text=Last training:')).toBeVisible()
   })
 
-  test('shows last session sets in the table', async ({ page }) => {
+  test('shows last ExerciseLog sets in the table', async ({ page }) => {
     const rows = page.locator('table tbody tr')
     await expect(rows).toHaveCount(2)
     // First row: weight 80.0 kg and 8 reps

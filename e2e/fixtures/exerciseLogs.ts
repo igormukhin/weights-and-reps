@@ -20,21 +20,21 @@ export interface SeedSet {
  *
  * Prerequisites: signInAsTestUser(page) must have been called first.
  */
-export async function seedSession(
+export async function seedExerciseLog(
   page: Page,
   exerciseId: string,
   dateStr: string,
   sets: SeedSet[],
 ): Promise<void> {
   await page.evaluate(
-    async ([exId, date, sessionSets]) => {
+    async ([exId, date, logSets]) => {
       const w = window as unknown as WindowE2E
       const uid = w.__e2eAuth.currentUser?.uid
-      if (!uid) throw new Error('seedSession: no authenticated user — call signInAsTestUser first')
+      if (!uid) throw new Error('seedExerciseLog: no authenticated user — call signInAsTestUser first')
       const ref = w.__e2eDoc(w.__e2eDb, 'users', uid, 'exercises', exId, 'exerciseLogs', date)
       await w.__e2eSetDoc(ref, {
         date,
-        sets: sessionSets,
+        sets: logSets,
         updatedAt: w.__e2eServerTimestamp(),
       })
     },
@@ -47,11 +47,11 @@ export async function seedSession(
  *
  * Prerequisites: signInAsTestUser(page) must have been called first.
  */
-export async function clearSessions(page: Page, exerciseId: string): Promise<void> {
+export async function clearExerciseLogs(page: Page, exerciseId: string): Promise<void> {
   await page.evaluate(async (exId) => {
     const w = window as unknown as { __e2eClearExerciseLogs?: (id: string) => Promise<void> }
     if (!w.__e2eClearExerciseLogs) {
-      throw new Error('clearSessions: __e2eClearExerciseLogs not found — ensure emulator build')
+      throw new Error('clearExerciseLogs: __e2eClearExerciseLogs not found — ensure emulator build')
     }
     await w.__e2eClearExerciseLogs(exId)
   }, exerciseId)

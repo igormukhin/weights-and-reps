@@ -1,10 +1,10 @@
 import { test, expect } from '../fixtures'
 import { signInAsTestUser } from '../fixtures/auth'
 import { clearExercises, seedExercise } from '../fixtures/exercises'
-import { seedSession, clearSessions, navigateToExercise } from '../fixtures/sessions'
+import { seedExerciseLog, clearExerciseLogs, navigateToExercise } from '../fixtures/exerciseLogs'
 
 // Selectors:
-//   Delete FAB:         [data-testid="delete-session-fab"]
+//   Delete FAB:         [data-testid="delete-exercise-log-fab"]
 //   Dialog title:       text="Delete today's log?"
 //   Dialog Delete btn:  role=button[name="Delete"]
 //   Pump it button:     role=button[name="Pump it!"]
@@ -17,7 +17,7 @@ let exerciseId: string
 // Today's date in YYYY-MM-DD (UTC)
 const TODAY = new Date().toISOString().split('T')[0]
 
-test.describe('Delete session', () => {
+test.describe('Delete ExerciseLog', () => {
   test.beforeAll(async ({ browser }) => {
     const page = await browser.newPage()
     try {
@@ -31,23 +31,23 @@ test.describe('Delete session', () => {
 
   test.beforeEach(async ({ page }) => {
     await signInAsTestUser(page)
-    // Re-seed today's session before each test so delete tests are independent
-    await clearSessions(page, exerciseId)
-    await seedSession(page, exerciseId, TODAY, [{ weight: 70, reps: 6 }])
+    // Re-seed today's ExerciseLog before each test so delete tests are independent
+    await clearExerciseLogs(page, exerciseId)
+    await seedExerciseLog(page, exerciseId, TODAY, [{ weight: 70, reps: 6 }])
     await navigateToExercise(page, exerciseId)
   })
 
-  test('delete FAB is visible when a session exists', async ({ page }) => {
-    await expect(page.locator('[data-testid="delete-session-fab"]')).toBeVisible()
+  test('delete FAB is visible when an ExerciseLog exists', async ({ page }) => {
+    await expect(page.locator('[data-testid="delete-exercise-log-fab"]')).toBeVisible()
   })
 
   test('clicking delete FAB shows confirmation dialog', async ({ page }) => {
-    await page.locator('[data-testid="delete-session-fab"]').click()
+    await page.locator('[data-testid="delete-exercise-log-fab"]').click()
     await expect(page.getByText("Delete today's log?")).toBeVisible()
   })
 
   test('confirming delete returns to read-only mode', async ({ page }) => {
-    await page.locator('[data-testid="delete-session-fab"]').click()
+    await page.locator('[data-testid="delete-exercise-log-fab"]').click()
     await page.getByRole('button', { name: 'Delete' }).click()
 
     // Edit mode gone, read-only mode restored

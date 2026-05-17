@@ -67,7 +67,7 @@
 
         <!-- Empty state -->
         <p v-else class="text-body-2 text-medium-emphasis mb-4">
-          No sessions recorded yet
+          No logs recorded yet
         </p>
 
         <!-- Pump it! button -->
@@ -113,7 +113,7 @@
   <!-- Delete ExerciseLog FAB — shown once log is persisted or has unsaved data -->
   <v-btn
     v-if="showDeleteButton"
-    data-testid="delete-session-fab"
+    data-testid="delete-exercise-log-fab"
     color="error"
     :icon="mdiDelete"
     size="large"

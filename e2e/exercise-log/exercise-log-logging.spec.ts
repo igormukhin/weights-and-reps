@@ -1,7 +1,7 @@
 import { test, expect } from '../fixtures'
 import { signInAsTestUser } from '../fixtures/auth'
 import { clearExercises, seedExercise } from '../fixtures/exercises'
-import { seedSession, clearSessions, navigateToExercise } from '../fixtures/sessions'
+import { seedExerciseLog, clearExerciseLogs, navigateToExercise } from '../fixtures/exerciseLogs'
 
 // Selectors:
 //   Pump it button:  role=button[name="Pump it!"]
@@ -20,15 +20,15 @@ const PAST_SETS = [
 
 let exerciseId: string
 
-test.describe('Start session', () => {
+test.describe('Logging mode', () => {
   test.beforeAll(async ({ browser }) => {
     const page = await browser.newPage()
     try {
       await signInAsTestUser(page)
       await clearExercises(page)
       exerciseId = await seedExercise(page, 'Squat', 1)
-      await clearSessions(page, exerciseId)
-      await seedSession(page, exerciseId, PAST_DATE, PAST_SETS)
+      await clearExerciseLogs(page, exerciseId)
+      await seedExerciseLog(page, exerciseId, PAST_DATE, PAST_SETS)
     } finally {
       await page.close()
     }
@@ -44,7 +44,7 @@ test.describe('Start session', () => {
     await expect(page.locator('.set-row').first()).toBeVisible()
   })
 
-  test('set rows are pre-filled with last session values', async ({ page }) => {
+  test('set rows are pre-filled with last ExerciseLog values', async ({ page }) => {
     await page.getByRole('button', { name: 'Pump it!' }).click()
 
     const firstRow = page.locator('.set-row').nth(0)
@@ -57,7 +57,7 @@ test.describe('Start session', () => {
   })
 
   test('pre-filled data persists after save and reload', async ({ page }) => {
-    // Serial: this test runs after the others; today's session may or may not exist.
+    // Serial: this test runs after the others; today's ExerciseLog may or may not exist.
     // Wait for loading to settle (either "Pump it!" or set rows will appear).
     const pumpItBtn = page.getByRole('button', { name: 'Pump it!' })
     const firstSetRow = page.locator('.set-row').first()

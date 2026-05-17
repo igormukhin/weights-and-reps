@@ -1,7 +1,7 @@
 import { test, expect } from '../fixtures'
 import { signInAsTestUser } from '../fixtures/auth'
 import { clearExercises, seedExercise } from '../fixtures/exercises'
-import { clearSessions, navigateToExercise } from '../fixtures/sessions'
+import { clearExerciseLogs, navigateToExercise } from '../fixtures/exerciseLogs'
 
 // Selectors:
 //   Set rows:        .set-row
@@ -26,8 +26,8 @@ test.describe('Edit sets', () => {
 
   test.beforeEach(async ({ page }) => {
     await signInAsTestUser(page)
-    // Clear sessions so each test starts in read-only mode with "Pump it!" visible
-    await clearSessions(page, exerciseId)
+    // Clear ExerciseLogs so each test starts in read-only mode with "Pump it!" visible
+    await clearExerciseLogs(page, exerciseId)
     await navigateToExercise(page, exerciseId)
     await page.getByRole('button', { name: 'Pump it!' }).click()
     await expect(page.locator('.set-row').first()).toBeVisible()

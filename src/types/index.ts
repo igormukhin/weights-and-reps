@@ -10,7 +10,7 @@ export interface Set {
   weight: number
   /** Number of repetitions. Minimum 1. Step: 1. Optional — a set with weight only is valid. */
   reps?: number
-  /** BumpIt label. True if the user marked this set for a weight bump next session. Absent = false. */
+  /** BumpIt label. True if the user marked this set for a weight bump next time they train this exercise. Absent = false. */
   bumpIt?: boolean
 }
 

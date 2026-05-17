@@ -1,7 +1,7 @@
 import { test, expect } from '../fixtures'
 import { signInAsTestUser } from '../fixtures/auth'
 import { clearExercises, seedExercise } from '../fixtures/exercises'
-import { navigateToExercise } from '../fixtures/sessions'
+import { navigateToExercise } from '../fixtures/exerciseLogs'
 
 test.describe.configure({ mode: 'serial' })
 

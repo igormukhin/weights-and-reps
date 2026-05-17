@@ -62,8 +62,3 @@ _Avoid_: Edit mode, active mode, session mode
 > **Domain expert:** "Yes — archiving only hides the Exercise from the active list. Its historical ExerciseLogs remain intact."
 > **Dev:** "What ExerciseCategory does 'Bench Press' belong to?"
 > **Domain expert:** "None — it has no colon prefix, so it's ungrouped. 'Chest: Bench Press' would belong to the Chest ExerciseCategory."
-
-## Flagged ambiguities
-
-- "session" was used in the original code for what is now **ExerciseLog** — resolved: the code concept is per-exercise-per-date, which "session" (implying a full workout) does not accurately describe.
-- "hidden" is the current field name in the code and data store for what the domain calls **archived** — not yet renamed; use "archived" in all new code and conversation.

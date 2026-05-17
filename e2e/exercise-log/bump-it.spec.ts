@@ -1,7 +1,7 @@
 import { test, expect } from '../fixtures'
 import { signInAsTestUser } from '../fixtures/auth'
 import { clearExercises, seedExercise } from '../fixtures/exercises'
-import { clearSessions, navigateToExercise } from '../fixtures/sessions'
+import { clearExerciseLogs, navigateToExercise } from '../fixtures/exerciseLogs'
 
 // Selectors:
 //   BumpIt button:   button containing '🆙' inside .set-row
@@ -26,7 +26,7 @@ test.describe('BumpIt toggle', () => {
 
   test.beforeEach(async ({ page }) => {
     await signInAsTestUser(page)
-    await clearSessions(page, exerciseId)
+    await clearExerciseLogs(page, exerciseId)
     await navigateToExercise(page, exerciseId)
     await page.getByRole('button', { name: 'Pump it!' }).click()
     await expect(page.locator('.set-row').first()).toBeVisible()
@@ -44,7 +44,7 @@ test.describe('BumpIt toggle', () => {
   })
 
   test('BumpIt state persists after save and reload', async ({ page }) => {
-    // Set a weight to make the session saveable, then toggle BumpIt
+    // Set a weight to make the ExerciseLog saveable, then toggle BumpIt
     const weightInput = page.locator('.set-row').nth(0).locator('input').nth(0)
     await weightInput.fill('60')
     await weightInput.blur()
