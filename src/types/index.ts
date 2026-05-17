@@ -4,7 +4,7 @@ import type { Timestamp } from 'firebase/firestore'
 // Domain types
 // ---------------------------------------------------------------------------
 
-/** A single set within a training session. Embedded in Session.sets. */
+/** A single set within an ExerciseLog. Embedded in ExerciseLog.sets. */
 export interface Set {
   /** Weight in kilograms. Negative values represent assisted exercises. Step: 2.5 kg. */
   weight: number
@@ -14,8 +14,8 @@ export interface Set {
   bumpIt?: boolean
 }
 
-/** A training session for one exercise on one calendar date. */
-export interface Session {
+/** The record of all sets performed for one exercise on one calendar date. */
+export interface ExerciseLog {
   /** Calendar date in YYYY-MM-DD format. Matches Firestore document ID. */
   date: string
   /** Ordered array of sets. Empty rows are never persisted. */
@@ -32,8 +32,8 @@ export interface Exercise {
   name: string
   /** Integer display position (1-based). Re-indexed on every reorder/insert. */
   position: number
-  /** True if the exercise has been hidden. One-way transition; no in-app restore. */
-  hidden: boolean
+  /** True if the exercise has been archived. One-way transition; no in-app restore. */
+  archived: boolean
   /** Server timestamp set once on creation. */
   createdAt: Timestamp
 }
@@ -53,8 +53,8 @@ export interface RenameExercisePayload {
   newName: string
 }
 
-/** Payload for saving a session (auto-save). */
-export interface SaveSessionPayload {
+/** Payload for saving an ExerciseLog (auto-save). */
+export interface SaveExerciseLogPayload {
   exerciseId: string
   date: string // YYYY-MM-DD
   sets: Set[]
@@ -64,20 +64,20 @@ export interface SaveSessionPayload {
 // UI / composable state types
 // ---------------------------------------------------------------------------
 
-/** Save status exposed by useSession composable. */
+/** Save status exposed by useExerciseLog composable. */
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
 /**
- * State returned by useSession composable.
+ * State returned by useExerciseLog composable.
  * Drives the ExerciseDetailView.
  */
-export interface SessionState {
-  /** Today's set data (editable). Null if no session exists yet today. */
+export interface ExerciseLogState {
+  /** Today's set data (editable). Null if no ExerciseLog exists yet today. */
   todaySets: (Partial<Set> | null)[]
-  /** Previous session's set data (read-only reference). Empty array if no history. */
+  /** Previous ExerciseLog's set data (read-only reference). Empty array if no history. */
   lastSets: Set[]
-  /** Date of the last (previous) session, formatted DD.MM.YYYY. Empty string if none. */
-  lastSessionDate: string
+  /** Date of the last ExerciseLog, formatted DD.MM.YYYY. Empty string if none. */
+  lastExerciseLogDate: string
   /** Current auto-save status. */
   saveStatus: SaveStatus
   /** Error message when saveStatus is 'error'. Null otherwise. */

@@ -20,12 +20,12 @@ function exercisesRef(uid: string) {
 // ---------------------------------------------------------------------------
 
 export async function getExercises(uid: string): Promise<Exercise[]> {
-  // Filter hidden client-side to avoid needing a composite index
+  // Filter archived client-side to avoid needing a composite index
   // (where + orderBy on different fields requires one in Firestore).
   const snap = await getDocs(exercisesRef(uid))
   return snap.docs
     .map((d) => ({ id: d.id, ...d.data() }) as Exercise)
-    .filter((e) => !e.hidden)
+    .filter((e) => !e.archived)
     .sort((a, b) => a.position - b.position)
 }
 
@@ -43,7 +43,7 @@ export async function createExercise(uid: string, name: string, position: number
   const ref = await addDoc(exercisesRef(uid), {
     name,
     position,
-    hidden: false,
+    archived: false,
     createdAt: serverTimestamp(),
   })
   return ref.id
@@ -53,8 +53,8 @@ export async function renameExercise(uid: string, id: string, newName: string): 
   await updateDoc(doc(db, 'users', uid, 'exercises', id), { name: newName })
 }
 
-export async function hideExercise(uid: string, id: string): Promise<void> {
-  await updateDoc(doc(db, 'users', uid, 'exercises', id), { hidden: true })
+export async function archiveExercise(uid: string, id: string): Promise<void> {
+  await updateDoc(doc(db, 'users', uid, 'exercises', id), { archived: true })
 }
 
 export async function updatePositions(

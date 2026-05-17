@@ -30,13 +30,13 @@ import { mdiDumbbell, mdiLogout, mdiPencil } from '@mdi/js'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useExercisesStore } from '@/stores/exercises'
-import { useSessionStore } from '@/stores/session'
+import { useExerciseLogStore } from '@/stores/exerciseLog'
 import { signOut } from '@/services/auth'
 import ExerciseGroupedList from '@/components/exercises/ExerciseGroupedList.vue'
 
 const authStore = useAuthStore()
 const exercisesStore = useExercisesStore()
-const sessionStore = useSessionStore()
+const exerciseLogStore = useExerciseLogStore()
 const router = useRouter()
 
 const uid = authStore.currentUser!.uid
@@ -50,7 +50,7 @@ onMounted(async () => {
 async function handleSignOut(): Promise<void> {
   await signOut()
   exercisesStore.clear()
-  sessionStore.clear()
+  exerciseLogStore.clear()
   router.push('/login')
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <v-dialog :model-value="modelValue" max-width="400" @update:model-value="$emit('update:modelValue', $event)">
     <v-card>
-      <v-card-title>Delete today's session?</v-card-title>
+      <v-card-title>Delete today's log?</v-card-title>
       <v-card-text>This cannot be undone.</v-card-text>
       <v-card-actions>
         <v-spacer />

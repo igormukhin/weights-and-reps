@@ -5,7 +5,7 @@ import { seedSession, clearSessions, navigateToExercise } from '../fixtures/sess
 
 // Selectors:
 //   Delete FAB:         [data-testid="delete-session-fab"]
-//   Dialog title:       text="Delete today's session?"
+//   Dialog title:       text="Delete today's log?"
 //   Dialog Delete btn:  role=button[name="Delete"]
 //   Pump it button:     role=button[name="Pump it!"]
 //   Set rows:           .set-row
@@ -43,7 +43,7 @@ test.describe('Delete session', () => {
 
   test('clicking delete FAB shows confirmation dialog', async ({ page }) => {
     await page.locator('[data-testid="delete-session-fab"]').click()
-    await expect(page.getByText("Delete today's session?")).toBeVisible()
+    await expect(page.getByText("Delete today's log?")).toBeVisible()
   })
 
   test('confirming delete returns to read-only mode', async ({ page }) => {

@@ -52,13 +52,13 @@ if (useEmulator) {
   ;(window as unknown as Record<string, unknown>).__e2eClearExercises = clearExercises
   ;(window as unknown as Record<string, unknown>).__e2eSetDoc = setDoc
   ;(window as unknown as Record<string, unknown>).__e2eDoc = doc
-  const clearSessions = async (exerciseId: string): Promise<void> => {
+  const clearExerciseLogs = async (exerciseId: string): Promise<void> => {
     if (!auth.currentUser) return
     const uid = auth.currentUser.uid
     const snap = await getDocs(
-      collection(db, 'users', uid, 'exercises', exerciseId, 'sessions'),
+      collection(db, 'users', uid, 'exercises', exerciseId, 'exerciseLogs'),
     )
     await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)))
   }
-  ;(window as unknown as Record<string, unknown>).__e2eClearSessions = clearSessions
+  ;(window as unknown as Record<string, unknown>).__e2eClearExerciseLogs = clearExerciseLogs
 }

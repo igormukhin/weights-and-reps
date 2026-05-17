@@ -39,11 +39,11 @@
         <v-progress-circular indeterminate color="primary" />
       </div>
 
-      <!-- READ-ONLY MODE: no today session -->
-      <template v-else-if="!hasTodaySession">
+      <!-- READ-ONLY MODE: no today ExerciseLog -->
+      <template v-else-if="!hasTodayExerciseLog">
 
-        <p v-if="lastSessionDate" class="text-body-2 text-medium-emphasis mb-4">
-          Last training: {{ lastSessionDate }}
+        <p v-if="lastExerciseLogDate" class="text-body-2 text-medium-emphasis mb-4">
+          Last training: {{ lastExerciseLogDate }}
         </p>
 
         <table v-if="lastSets.length > 0" class="mb-4">
@@ -71,14 +71,14 @@
         </p>
 
         <!-- Pump it! button -->
-        <v-btn color="primary" block class="mt-6" @click="startSession()">
+        <v-btn color="primary" block class="mt-6" @click="startExerciseLog()">
           Pump it!
         </v-btn>
 
       </template>
 
-      <!-- EDIT MODE: today session exists -->
-      <template v-else-if="hasTodaySession">
+      <!-- EDIT MODE: today ExerciseLog exists -->
+      <template v-else-if="hasTodayExerciseLog">
 
         <!-- Column headers -->
         <v-row no-gutters class="mb-1 text-caption text-medium-emphasis">
@@ -110,7 +110,7 @@
     </v-container>
   </v-main>
 
-  <!-- Delete session FAB — shown once session is persisted or has unsaved data -->
+  <!-- Delete ExerciseLog FAB — shown once log is persisted or has unsaved data -->
   <v-btn
     v-if="showDeleteButton"
     data-testid="delete-session-fab"
@@ -137,7 +137,7 @@
   </v-snackbar>
 
   <!-- Delete confirmation dialog -->
-  <DeleteSessionDialog
+  <DeleteExerciseLogDialog
     v-model="showDeleteDialog"
     @confirm="handleDelete"
   />
@@ -149,9 +149,9 @@ import { mdiArrowLeft, mdiDelete, mdiPencil } from '@mdi/js'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useExercisesStore } from '@/stores/exercises'
-import { useSession } from '@/composables/useSession'
-import SetRow from '@/components/session/SetRow.vue'
-import DeleteSessionDialog from '@/components/session/DeleteSessionDialog.vue'
+import { useExerciseLog } from '@/composables/useExerciseLog'
+import SetRow from '@/components/exerciseLog/SetRow.vue'
+import DeleteExerciseLogDialog from '@/components/exerciseLog/DeleteExerciseLogDialog.vue'
 import EditExerciseDialog from '@/components/exercises/EditExerciseDialog.vue'
 
 const route = useRoute()
@@ -172,20 +172,20 @@ const weightStep = computed(() => isDumbbell.value ? 2 : 2.5)
 
 const {
   isLoading,
-  hasTodaySession,
-  isSessionPersisted,
+  hasTodayExerciseLog,
+  isExerciseLogPersisted,
   todaySets,
   lastSets,
-  lastSessionDate,
+  lastExerciseLogDate,
   saveStatus,
   saveError,
   init,
   flushSave,
-  startSession,
+  startExerciseLog,
   updateSet,
   toggleBumpIt,
-  deleteSession,
-} = useSession(uid, exerciseId)
+  deleteExerciseLog,
+} = useExerciseLog(uid, exerciseId)
 
 const showError = ref(false)
 const showDeleteDialog = ref(false)
@@ -196,7 +196,7 @@ watch(saveError, (val) => {
 })
 
 const showDeleteButton = computed(() =>
-  isSessionPersisted.value ||
+  isExerciseLogPersisted.value ||
   todaySets.value.some((s) => s.weight !== undefined || s.reps !== undefined),
 )
 
@@ -214,7 +214,7 @@ const statusLabel = computed(() => {
 
 async function handleDelete(): Promise<void> {
   showDeleteDialog.value = false
-  await deleteSession()
+  await deleteExerciseLog()
 }
 
 onBeforeUnmount(() => {

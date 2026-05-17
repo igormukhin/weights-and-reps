@@ -4,7 +4,7 @@ import type { Exercise } from '@/types'
 import { longestCommonPrefixLength, findInsertPosition } from './exercisePosition'
 
 function ex(id: string, name: string, position: number): Exercise {
-  return { id, name, position, hidden: false, createdAt: null as unknown as Timestamp }
+  return { id, name, position, archived: false, createdAt: null as unknown as Timestamp }
 }
 
 describe('longestCommonPrefixLength', () => {

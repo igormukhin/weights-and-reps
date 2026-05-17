@@ -23,8 +23,8 @@
         :icon="mdiEyeOffOutline"
         size="small"
         variant="text"
-        data-testid="hide-exercise-btn"
-        @click.stop="showHide = true"
+        data-testid="archive-exercise-btn"
+        @click.stop="showArchive = true"
       />
     </template>
   </v-list-item>
@@ -36,11 +36,11 @@
     @close="onEditClose"
   />
 
-  <HideExerciseDialog
-    v-if="showHide"
+  <ArchiveExerciseDialog
+    v-if="showArchive"
     :exercise-id="exercise.id"
     :exercise-name="exercise.name"
-    @close="showHide = false"
+    @close="showArchive = false"
   />
 </template>
 
@@ -49,13 +49,13 @@ import { ref } from 'vue'
 import { mdiDrag, mdiEyeOffOutline, mdiPencilOutline } from '@mdi/js'
 import type { Exercise } from '@/types'
 import EditExerciseDialog from './EditExerciseDialog.vue'
-import HideExerciseDialog from './HideExerciseDialog.vue'
+import ArchiveExerciseDialog from './ArchiveExerciseDialog.vue'
 
 defineProps<{ exercise: Exercise }>()
 const emit = defineEmits<{ renamed: [id: string] }>()
 
 const showEdit = ref(false)
-const showHide = ref(false)
+const showArchive = ref(false)
 
 function onEditClose(id?: string): void {
   showEdit.value = false

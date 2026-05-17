@@ -60,7 +60,7 @@ import { useRouter } from 'vue-router'
 import draggable from 'vuedraggable'
 import { useAuthStore } from '@/stores/auth'
 import { useExercisesStore } from '@/stores/exercises'
-import { useSessionStore } from '@/stores/session'
+import { useExerciseLogStore } from '@/stores/exerciseLog'
 import { useExercises } from '@/composables/useExercises'
 import { signOut } from '@/services/auth'
 import ExerciseListItemEdit from '@/components/exercises/ExerciseListItemEdit.vue'
@@ -68,7 +68,7 @@ import AddExerciseDialog from '@/components/exercises/AddExerciseDialog.vue'
 
 const authStore = useAuthStore()
 const exercisesStore = useExercisesStore()
-const sessionStore = useSessionStore()
+const exerciseLogStore = useExerciseLogStore()
 const router = useRouter()
 
 const uid = authStore.currentUser!.uid
@@ -86,7 +86,7 @@ onMounted(async () => {
 async function handleSignOut(): Promise<void> {
   await signOut()
   exercisesStore.clear()
-  sessionStore.clear()
+  exerciseLogStore.clear()
   router.push('/login')
 }
 

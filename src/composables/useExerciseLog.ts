@@ -2,24 +2,24 @@ import { ref } from 'vue'
 import type { Ref } from 'vue'
 import type { Set, SaveStatus } from '@/types'
 import {
-  getTodaySession,
-  getLastSession,
-  saveSession,
-  deleteSession as deleteSessionService,
-} from '@/services/sessions'
+  getTodayExerciseLog,
+  getLastExerciseLog,
+  saveExerciseLog,
+  deleteExerciseLog as deleteExerciseLogService,
+} from '@/services/exerciseLogs'
 import { todayISO, formatGermanDate } from '@/utils/date'
 import { enforceRowInvariants } from '@/utils/setRowInvariants'
-import { useSessionStore } from '@/stores/session'
+import { useExerciseLogStore } from '@/stores/exerciseLog'
 
-export function useSession(uid: string, exerciseId: string) {
-  const sessionStore = useSessionStore()
+export function useExerciseLog(uid: string, exerciseId: string) {
+  const exerciseLogStore = useExerciseLogStore()
 
   const isLoading = ref(true)
-  const hasTodaySession = ref(false)
-  const isSessionPersisted = ref(false)
+  const hasTodayExerciseLog = ref(false)
+  const isExerciseLogPersisted = ref(false)
   const todaySets = ref<Partial<Set>[]>([])
   const lastSets = ref<Set[]>([])
-  const lastSessionDate = ref('')
+  const lastExerciseLogDate = ref('')
   const saveStatus = ref<SaveStatus>('idle')
   const saveError = ref<string | null>(null)
 
@@ -29,31 +29,31 @@ export function useSession(uid: string, exerciseId: string) {
   // Cache sync
   // ---------------------------------------------------------------------------
   function syncToCache(): void {
-    sessionStore.set(exerciseId, {
+    exerciseLogStore.set(exerciseId, {
       date: todayISO(),
-      hasTodaySession: hasTodaySession.value,
-      isSessionPersisted: isSessionPersisted.value,
+      hasTodayExerciseLog: hasTodayExerciseLog.value,
+      isExerciseLogPersisted: isExerciseLogPersisted.value,
       todaySets: todaySets.value.map((s) => ({ ...s })),
       lastSets: lastSets.value,
-      lastSessionDate: lastSessionDate.value,
+      lastExerciseLogDate: lastExerciseLogDate.value,
     })
   }
 
   // ---------------------------------------------------------------------------
-  // Init: load today's session and last session on mount
+  // Init: load today's ExerciseLog and last ExerciseLog on mount
   // ---------------------------------------------------------------------------
   async function init(): Promise<void> {
     const today = todayISO()
 
     // Serve from cache if available (same calendar day)
-    const cached = sessionStore.get(exerciseId, today)
+    const cached = exerciseLogStore.get(exerciseId, today)
     if (cached) {
-      hasTodaySession.value = cached.hasTodaySession
-      isSessionPersisted.value = cached.isSessionPersisted
+      hasTodayExerciseLog.value = cached.hasTodayExerciseLog
+      isExerciseLogPersisted.value = cached.isExerciseLogPersisted
       todaySets.value = cached.todaySets.map((s) => ({ ...s }))
       lastSets.value = cached.lastSets
-      lastSessionDate.value = cached.lastSessionDate
-      if (hasTodaySession.value) {
+      lastExerciseLogDate.value = cached.lastExerciseLogDate
+      if (hasTodayExerciseLog.value) {
         enforceRowInvariants(todaySets.value)
         syncToCache()
       }
@@ -62,24 +62,24 @@ export function useSession(uid: string, exerciseId: string) {
     }
 
     // Cache miss — fetch from Firestore
-    const [todaySession, lastSession] = await Promise.all([
-      getTodaySession(uid, exerciseId, today),
-      getLastSession(uid, exerciseId, today),
+    const [todayLog, lastLog] = await Promise.all([
+      getTodayExerciseLog(uid, exerciseId, today),
+      getLastExerciseLog(uid, exerciseId, today),
     ])
 
-    lastSets.value = lastSession?.sets ?? []
-    lastSessionDate.value = lastSession ? formatGermanDate(lastSession.date) : ''
+    lastSets.value = lastLog?.sets ?? []
+    lastExerciseLogDate.value = lastLog ? formatGermanDate(lastLog.date) : ''
 
     isLoading.value = false
 
-    if (todaySession) {
-      hasTodaySession.value = true
-      isSessionPersisted.value = true
-      todaySets.value = todaySession.sets.map((s) => ({ ...s }))
+    if (todayLog) {
+      hasTodayExerciseLog.value = true
+      isExerciseLogPersisted.value = true
+      todaySets.value = todayLog.sets.map((s) => ({ ...s }))
       enforceRowInvariants(todaySets.value)
     } else {
-      hasTodaySession.value = false
-      isSessionPersisted.value = false
+      hasTodayExerciseLog.value = false
+      isExerciseLogPersisted.value = false
       todaySets.value = []
     }
 
@@ -87,16 +87,16 @@ export function useSession(uid: string, exerciseId: string) {
   }
 
   // ---------------------------------------------------------------------------
-  // Start a new session: pre-fill from last session, enter edit mode.
-  // Session is NOT written to Firestore yet — that happens on first data entry.
+  // Start a new ExerciseLog: pre-fill from last log, enter Logging mode.
+  // ExerciseLog is NOT written to Firestore yet — that happens on first data entry.
   // ---------------------------------------------------------------------------
-  function startSession(): void {
+  function startExerciseLog(): void {
     todaySets.value = lastSets.value.length > 0
       ? lastSets.value.map((s) => ({ ...s }))
       : []
     enforceRowInvariants(todaySets.value)
-    hasTodaySession.value = true
-    isSessionPersisted.value = false
+    hasTodayExerciseLog.value = true
+    isExerciseLogPersisted.value = false
     syncToCache()
   }
 
@@ -125,18 +125,18 @@ export function useSession(uid: string, exerciseId: string) {
   }
 
   // ---------------------------------------------------------------------------
-  // Delete today's session
+  // Delete today's ExerciseLog
   // ---------------------------------------------------------------------------
-  async function deleteSession(): Promise<void> {
+  async function deleteExerciseLog(): Promise<void> {
     // Cancel any pending debounced save so it doesn't fire after deletion
     if (saveTimer !== null) {
       clearTimeout(saveTimer)
       saveTimer = null
     }
 
-    if (isSessionPersisted.value) {
+    if (isExerciseLogPersisted.value) {
       try {
-        await deleteSessionService(uid, exerciseId, todayISO())
+        await deleteExerciseLogService(uid, exerciseId, todayISO())
       } catch (e) {
         saveStatus.value = 'error'
         saveError.value = 'Failed to delete. Check your connection.'
@@ -145,8 +145,8 @@ export function useSession(uid: string, exerciseId: string) {
       }
     }
 
-    hasTodaySession.value = false
-    isSessionPersisted.value = false
+    hasTodayExerciseLog.value = false
+    isExerciseLogPersisted.value = false
     todaySets.value = []
     saveStatus.value = 'idle'
     syncToCache()
@@ -177,14 +177,14 @@ export function useSession(uid: string, exerciseId: string) {
       (s): s is Set => s.weight !== undefined,
     )
 
-    // All inputs empty — delete persisted session, or skip if not yet saved
+    // All inputs empty — delete persisted ExerciseLog, or skip if not yet saved
     if (validSets.length === 0) {
-      if (isSessionPersisted.value) {
+      if (isExerciseLogPersisted.value) {
         saveStatus.value = 'saving'
         saveError.value = null
         try {
-          await deleteSessionService(uid, exerciseId, todayISO())
-          isSessionPersisted.value = false
+          await deleteExerciseLogService(uid, exerciseId, todayISO())
+          isExerciseLogPersisted.value = false
           saveStatus.value = 'saved'
           syncToCache()
         } catch (e) {
@@ -200,13 +200,13 @@ export function useSession(uid: string, exerciseId: string) {
     saveError.value = null
 
     try {
-      await saveSession(uid, exerciseId, {
+      await saveExerciseLog(uid, exerciseId, {
         exerciseId,
         date: todayISO(),
         sets: validSets,
       })
       saveStatus.value = 'saved'
-      isSessionPersisted.value = true
+      isExerciseLogPersisted.value = true
       syncToCache()
     } catch (e) {
       saveStatus.value = 'error'
@@ -217,18 +217,18 @@ export function useSession(uid: string, exerciseId: string) {
 
   return {
     isLoading: isLoading as Ref<boolean>,
-    hasTodaySession: hasTodaySession as Ref<boolean>,
-    isSessionPersisted: isSessionPersisted as Ref<boolean>,
+    hasTodayExerciseLog: hasTodayExerciseLog as Ref<boolean>,
+    isExerciseLogPersisted: isExerciseLogPersisted as Ref<boolean>,
     todaySets: todaySets as Ref<Partial<Set>[]>,
     lastSets,
-    lastSessionDate,
+    lastExerciseLogDate,
     saveStatus,
     saveError,
     init,
     flushSave,
-    startSession,
+    startExerciseLog,
     updateSet,
     toggleBumpIt,
-    deleteSession,
+    deleteExerciseLog,
   }
 }

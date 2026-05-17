@@ -6,7 +6,7 @@ type WindowE2E = {
   __e2eSetDoc: (ref: unknown, data: unknown) => Promise<void>
   __e2eDoc: (db: unknown, ...segments: string[]) => unknown
   __e2eServerTimestamp: () => unknown
-  __e2eClearSessions: (exerciseId: string) => Promise<void>
+  __e2eClearExerciseLogs: (exerciseId: string) => Promise<void>
 }
 
 export interface SeedSet {
@@ -16,7 +16,7 @@ export interface SeedSet {
 }
 
 /**
- * Writes a session document directly into the Firestore emulator.
+ * Writes an ExerciseLog document directly into the Firestore emulator.
  *
  * Prerequisites: signInAsTestUser(page) must have been called first.
  */
@@ -31,7 +31,7 @@ export async function seedSession(
       const w = window as unknown as WindowE2E
       const uid = w.__e2eAuth.currentUser?.uid
       if (!uid) throw new Error('seedSession: no authenticated user — call signInAsTestUser first')
-      const ref = w.__e2eDoc(w.__e2eDb, 'users', uid, 'exercises', exId, 'sessions', date)
+      const ref = w.__e2eDoc(w.__e2eDb, 'users', uid, 'exercises', exId, 'exerciseLogs', date)
       await w.__e2eSetDoc(ref, {
         date,
         sets: sessionSets,
@@ -43,17 +43,17 @@ export async function seedSession(
 }
 
 /**
- * Deletes all session documents for the given exercise from the Firestore emulator.
+ * Deletes all ExerciseLog documents for the given exercise from the Firestore emulator.
  *
  * Prerequisites: signInAsTestUser(page) must have been called first.
  */
 export async function clearSessions(page: Page, exerciseId: string): Promise<void> {
   await page.evaluate(async (exId) => {
-    const w = window as unknown as { __e2eClearSessions?: (id: string) => Promise<void> }
-    if (!w.__e2eClearSessions) {
-      throw new Error('clearSessions: __e2eClearSessions not found — ensure emulator build')
+    const w = window as unknown as { __e2eClearExerciseLogs?: (id: string) => Promise<void> }
+    if (!w.__e2eClearExerciseLogs) {
+      throw new Error('clearSessions: __e2eClearExerciseLogs not found — ensure emulator build')
     }
-    await w.__e2eClearSessions(exId)
+    await w.__e2eClearExerciseLogs(exId)
   }, exerciseId)
 }
 

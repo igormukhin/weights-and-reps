@@ -1,7 +1,7 @@
 <template>
   <v-dialog :model-value="true" max-width="400" @update:model-value="$emit('close')">
     <v-card>
-      <v-card-title>Hide exercise?</v-card-title>
+      <v-card-title>Archive exercise?</v-card-title>
       <v-card-text>
         <p>
           <strong>{{ exerciseName }}</strong> will be removed from your list.
@@ -14,7 +14,7 @@
       <v-card-actions>
         <v-spacer />
         <v-btn variant="text" @click="$emit('close')">Cancel</v-btn>
-        <v-btn color="error" :loading="loading" @click="confirm">Hide</v-btn>
+        <v-btn color="error" :loading="loading" @click="confirm">Archive</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -33,13 +33,13 @@ const props = defineProps<{
 const emit = defineEmits<{ close: [] }>()
 
 const authStore = useAuthStore()
-const { hideExercise } = useExercises(authStore.currentUser!.uid)
+const { archiveExercise } = useExercises(authStore.currentUser!.uid)
 
 const loading = ref(false)
 
 async function confirm(): Promise<void> {
   loading.value = true
-  await hideExercise(props.exerciseId)
+  await archiveExercise(props.exerciseId)
   loading.value = false
   emit('close')
 }

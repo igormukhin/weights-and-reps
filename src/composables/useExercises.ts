@@ -3,7 +3,7 @@ import { useExercisesStore } from '@/stores/exercises'
 import {
   createExercise,
   renameExercise as renameExerciseService,
-  hideExercise as hideExerciseService,
+  archiveExercise as archiveExerciseService,
   updatePositions,
 } from '@/services/exercises'
 import { findInsertPosition } from '@/utils/exercisePosition'
@@ -59,7 +59,7 @@ export function useExercises(uid: string) {
       id,
       name: trimmed,
       position: insertAt,
-      hidden: false,
+      archived: false,
       createdAt: null as unknown as Exercise['createdAt'], // filled by server
     }
 
@@ -84,8 +84,8 @@ export function useExercises(uid: string) {
     return {}
   }
 
-  async function hideExercise(id: string): Promise<void> {
-    await hideExerciseService(uid, id)
+  async function archiveExercise(id: string): Promise<void> {
+    await archiveExerciseService(uid, id)
     store.exercises = store.exercises.filter((e) => e.id !== id)
   }
 
@@ -93,5 +93,5 @@ export function useExercises(uid: string) {
     await reindexAndPersist(newList)
   }
 
-  return { addExercise, renameExercise, hideExercise, reorder }
+  return { addExercise, renameExercise, archiveExercise, reorder }
 }
