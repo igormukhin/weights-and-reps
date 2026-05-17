@@ -3,7 +3,7 @@
 
 # Weights and Reps
 
-A lightweight personal training tracker built for speed and simplicity. Logs exercises, weights, sets, and reps with a clean, distraction-free interface designed for quick data entry mid-workout. Maintains a full historical record of your training sessions.
+A lightweight personal training tracker built for speed and simplicity. Logs exercises, weights, sets, and reps with a clean, distraction-free interface designed for quick data entry mid-workout. Maintains a full historical record of your exercise logs.
 
 # Technologies
 

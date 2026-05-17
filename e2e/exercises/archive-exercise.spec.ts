@@ -37,7 +37,7 @@ test.describe('Archive exercise', () => {
     await expect(page.locator('.exercise-name', { hasText: 'Pull-up' })).toBeVisible()
   })
 
-  test('archived exercise stays hidden after page reload', async ({ page }) => {
+  test('archived exercise remains absent after page reload', async ({ page }) => {
     await page.reload()
     await expect(page.locator('.exercise-name', { hasText: 'Squat' })).not.toBeVisible()
   })

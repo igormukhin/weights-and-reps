@@ -3,7 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // All user data is scoped to the authenticated user's UID.
     // This rule covers /users/{uid}/exercises/** and
-    // /users/{uid}/exercises/{id}/sessions/** via the wildcard.
+    // /users/{uid}/exercises/{id}/exerciseLogs/** via the wildcard.
     match /users/{uid}/{document=**} {
       allow read, write: if request.auth != null
                          && request.auth.uid == uid;

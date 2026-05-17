@@ -4,8 +4,8 @@ Auto-generated from all feature plans. Last updated: 2026-04-08
 
 ## Active Technologies
 - TypeScript 5.x (strict mode) + Vue 3 (Composition API), Vuetify 3, Pinia, Firebase SDK v10+ (002-exercise-detail-redesign)
-- Firestore — `users/{uid}/exercises/{exerciseId}/sessions/{YYYY-MM-DD}` (002-exercise-detail-redesign)
-- Firestore — `users/{uid}/exercises/{exerciseId}/sessions/{YYYY-MM-DD}` (embedded `sets[]` array) (003-set-bump-label)
+- Firestore — `users/{uid}/exercises/{exerciseId}/exerciseLogs/{YYYY-MM-DD}` (002-exercise-detail-redesign)
+- Firestore — `users/{uid}/exercises/{exerciseId}/exerciseLogs/{YYYY-MM-DD}` (embedded `sets[]` array) (003-set-bump-label)
 - TypeScript 5.x (strict mode) + Vue 3 (Composition API), Vuetify 3, vuedraggable (004-exercise-edit-mode)
 - N/A (no data model changes) (004-exercise-edit-mode)
 - TypeScript 5.6 (strict mode) + Vue 3, Vuetify 3, Vite 6, Firebase SDK v10, Playwright (new), firebase-tools (new, dev) (005-e2e-test-setup)
@@ -18,10 +18,10 @@ Auto-generated from all feature plans. Last updated: 2026-04-08
 ```text
 src/
 ├── components/exercises/   # Exercise list UI
-├── components/session/     # Set row UI
-├── composables/            # useExercises, useSession
+├── components/exerciseLog/ # Set row UI
+├── composables/            # useExercises, useExerciseLog
 ├── router/                 # Vue Router (auth guard)
-├── services/               # Firebase auth, exercises, sessions
+├── services/               # Firebase auth, exercises, exerciseLogs
 ├── stores/                 # Pinia: auth, exercises
 ├── types/                  # TypeScript interfaces
 └── views/                  # LoginView, ExercisesView, ExerciseDetailView
@@ -59,4 +59,4 @@ Uses the five default label names (`needs-triage`, `needs-info`, `ready-for-agen
 
 ### Domain docs
 
-Single-context repo — one `CONTEXT.md` + `docs/adr/` at the root (neither exists yet; skills will proceed silently until created). See `docs/agents/domain.md`.
+Single-context repo — one `CONTEXT.md` + `docs/adr/` at the root (`CONTEXT.md` exists; `docs/adr/` not yet created). See `docs/agents/domain.md`.
