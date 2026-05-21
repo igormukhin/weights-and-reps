@@ -19,11 +19,27 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-vue':      ['vue', 'vue-router', 'pinia'],
-          'vendor-vuetify':  ['vuetify'],
-          'vendor-firebase-core': ['firebase/app', 'firebase/auth'],
-          'vendor-firebase-db':   ['firebase/firestore'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('vuetify')) {
+              return 'vendor-vuetify';
+            }
+            if (id.includes('firebase/firestore') || id.includes('@firebase/firestore')) {
+              return 'vendor-firebase-db';
+            }
+            if (
+              id.includes('firebase/app') ||
+              id.includes('firebase/auth') ||
+              id.includes('@firebase/auth') ||
+              id.includes('@firebase/app') ||
+              id.includes('@firebase/util')
+            ) {
+              return 'vendor-firebase-core';
+            }
+            if (id.includes('vue') || id.includes('pinia')) {
+              return 'vendor-vue';
+            }
+          }
         },
       },
     },
