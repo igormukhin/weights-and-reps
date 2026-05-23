@@ -30,6 +30,8 @@ export interface Exercise {
   id: string
   /** Display name. Unique per user (case-insensitive). */
   name: string
+  /** The exercise category (e.g. Chest, Back). Optional if ungrouped. */
+  category?: string
   /** Integer display position (1-based). Re-indexed on every reorder/insert. */
   position: number
   /** True if the exercise has been archived. One-way transition; no in-app restore. */
@@ -45,12 +47,14 @@ export interface Exercise {
 /** Payload for creating a new exercise. */
 export interface CreateExercisePayload {
   name: string
+  category?: string
 }
 
-/** Payload for renaming an existing exercise. */
-export interface RenameExercisePayload {
+/** Payload for updating an existing exercise. */
+export interface UpdateExercisePayload {
   id: string
-  newName: string
+  name: string
+  category?: string
 }
 
 /** Payload for saving an ExerciseLog (auto-save). */

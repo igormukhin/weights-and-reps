@@ -45,6 +45,8 @@ TypeScript 5.x (strict mode): Follow standard conventions
 
 
 <!-- MANUAL ADDITIONS START -->
+## Persistent Git Instructions
+- **Git Commits:** Never stage or commit changes to the Git repository unless specifically and explicitly requested by the user. Do not perform proactive Git commits on follow-up tasks.
 <!-- MANUAL ADDITIONS END -->
 
 ## Agent skills

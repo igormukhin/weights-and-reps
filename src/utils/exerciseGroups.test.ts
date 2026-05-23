@@ -1,45 +1,23 @@
 import { describe, it, expect } from 'vitest'
 import type { Timestamp } from 'firebase/firestore'
 import type { Exercise } from '@/types'
-import { parseExerciseName, groupExercises } from './exerciseGroups'
+import { groupExercises } from './exerciseGroups'
 
-function ex(id: string, name: string, position: number): Exercise {
-  return { id, name, position, archived: false, createdAt: null as unknown as Timestamp }
+function ex(id: string, name: string, position: number, category?: string): Exercise {
+  return { id, name, category, position, archived: false, createdAt: null as unknown as Timestamp }
 }
-
-describe('parseExerciseName', () => {
-  it('splits on first colon and trims both parts', () => {
-    expect(parseExerciseName('Chest: Bench Press')).toEqual({ group: 'Chest', shortName: 'Bench Press' })
-  })
-
-  it('trims whitespace around colon', () => {
-    expect(parseExerciseName('Back :  Pull-up  ')).toEqual({ group: 'Back', shortName: 'Pull-up' })
-  })
-
-  it('uses only the first colon as the split point', () => {
-    expect(parseExerciseName('A: B: C')).toEqual({ group: 'A', shortName: 'B: C' })
-  })
-
-  it('returns ungrouped when no colon present', () => {
-    expect(parseExerciseName('Plank')).toEqual({ group: '(ungrouped)', shortName: 'Plank' })
-  })
-
-  it('returns ungrouped for empty string', () => {
-    expect(parseExerciseName('')).toEqual({ group: '(ungrouped)', shortName: '' })
-  })
-})
 
 describe('groupExercises', () => {
   it('returns empty array for empty input', () => {
     expect(groupExercises([])).toEqual([])
   })
 
-  it('groups exercises by prefix and sorts groups alphabetically', () => {
+  it('groups exercises by category and sorts groups alphabetically', () => {
     const exercises = [
-      ex('1', 'Chest: Bench Press', 1),
-      ex('2', 'Back: Pull-up', 2),
-      ex('3', 'Chest: Cable Crossover', 3),
-      ex('4', 'Back: Row', 4),
+      ex('1', 'Bench Press', 1, 'Chest'),
+      ex('2', 'Pull-up', 2, 'Back'),
+      ex('3', 'Cable Crossover', 3, 'Chest'),
+      ex('4', 'Row', 4, 'Back'),
     ]
     const groups = groupExercises(exercises)
     expect(groups).toHaveLength(2)
@@ -57,9 +35,9 @@ describe('groupExercises', () => {
 
   it('places ungrouped exercises last', () => {
     const exercises = [
-      ex('1', 'Chest: Bench Press', 1),
+      ex('1', 'Bench Press', 1, 'Chest'),
       ex('2', 'Plank', 2),
-      ex('3', 'Abs: Crunch', 3),
+      ex('3', 'Crunch', 3, 'Abs'),
     ]
     const groups = groupExercises(exercises)
     expect(groups).toHaveLength(3)
@@ -71,8 +49,8 @@ describe('groupExercises', () => {
 
   it('sorts named groups case-insensitively', () => {
     const exercises = [
-      ex('1', 'legs: Squat', 1),
-      ex('2', 'Arms: Curl', 2),
+      ex('1', 'Squat', 1, 'legs'),
+      ex('2', 'Curl', 2, 'Arms'),
     ]
     const groups = groupExercises(exercises)
     expect(groups[0].name).toBe('Arms')
@@ -81,9 +59,9 @@ describe('groupExercises', () => {
 
   it('preserves position-based order of exercises within a group', () => {
     const exercises = [
-      ex('1', 'Chest: Bench Press', 1),
-      ex('2', 'Chest: Incline Press', 2),
-      ex('3', 'Chest: Cable Crossover', 3),
+      ex('1', 'Bench Press', 1, 'Chest'),
+      ex('2', 'Incline Press', 2, 'Chest'),
+      ex('3', 'Cable Crossover', 3, 'Chest'),
     ]
     const [group] = groupExercises(exercises)
     expect(group.exercises.map((e) => e.id)).toEqual(['1', '2', '3'])

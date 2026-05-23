@@ -5,19 +5,11 @@ export interface ExerciseGroup {
   exercises: { id: string; shortName: string }[]
 }
 
-export function parseExerciseName(name: string): { group: string; shortName: string } {
-  const colonIndex = name.indexOf(':')
-  if (colonIndex === -1) return { group: '(ungrouped)', shortName: name }
-  return {
-    group: name.slice(0, colonIndex).trim(),
-    shortName: name.slice(colonIndex + 1).trim(),
-  }
-}
-
 export function groupExercises(exercises: Exercise[]): ExerciseGroup[] {
   const map = new Map<string, { id: string; shortName: string }[]>()
   for (const ex of exercises) {
-    const { group, shortName } = parseExerciseName(ex.name)
+    const group = ex.category?.trim() || '(ungrouped)'
+    const shortName = ex.name
     if (!map.has(group)) map.set(group, [])
     map.get(group)!.push({ id: ex.id, shortName })
   }

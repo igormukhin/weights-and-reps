@@ -21,7 +21,7 @@ A named strength movement a user tracks over time. Can be archived when no longe
 _Avoid_: lift, movement, workout
 
 **ExerciseCategory**:
-A named grouping of exercises sharing a common prefix in their name (e.g. "Chest" in "Chest: Bench Press"). Derived from the exercise name; not a standalone entity.
+A named grouping of exercises. Stored as a separate field (`category`) on the exercise; not a separate top-level collection.
 _Avoid_: ExerciseGroup, group, muscle group
 
 **Exercise List**:
@@ -49,7 +49,7 @@ _Avoid_: Edit mode, active mode, session mode
 - An **Exercise** has zero or more **ExerciseLogs** (one per training day)
 - An **ExerciseLog** contains one or more **Sets**
 - A **Set** may carry a **BumpIt** flag
-- An **Exercise** belongs to at most one **ExerciseCategory** (inferred from its name)
+- An **Exercise** belongs to at most one **ExerciseCategory** (defined by its `category` field)
 - The **last ExerciseLog** is the most recent past ExerciseLog for a given Exercise — shown read-only as a reference when logging today
 
 ## Example dialogue
@@ -60,5 +60,3 @@ _Avoid_: Edit mode, active mode, session mode
 > **Domain expert:** "No — BumpIt is a manual reminder only. The user sees the 🆙 marker and decides to increase the weight themselves."
 > **Dev:** "Can an archived Exercise still have ExerciseLogs?"
 > **Domain expert:** "Yes — archiving only hides the Exercise from the active list. Its historical ExerciseLogs remain intact."
-> **Dev:** "What ExerciseCategory does 'Bench Press' belong to?"
-> **Domain expert:** "None — it has no colon prefix, so it's ungrouped. 'Chest: Bench Press' would belong to the Chest ExerciseCategory."

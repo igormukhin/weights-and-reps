@@ -7,7 +7,15 @@
           v-model="name"
           label="Exercise name"
           autofocus
+          class="mb-3"
           :error-messages="errorMessage"
+          @keyup.enter="submit"
+        />
+        <v-combobox
+          v-model="category"
+          label="Category (optional)"
+          :items="categories"
+          clearable
           @keyup.enter="submit"
         />
       </v-card-text>
@@ -21,24 +29,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useExercisesStore } from '@/stores/exercises'
 import { useExercises } from '@/composables/useExercises'
 
 const emit = defineEmits<{ close: [id?: string] }>()
 
 const authStore = useAuthStore()
+const exercisesStore = useExercisesStore()
 const { addExercise } = useExercises(authStore.currentUser!.uid)
 
 const name = ref('')
+const category = ref<string | null>(null)
 const errorMessage = ref('')
 const loading = ref(false)
+
+const categories = computed(() => exercisesStore.categories)
 
 async function submit(): Promise<void> {
   errorMessage.value = ''
   loading.value = true
   try {
-    const result = await addExercise(name.value)
+    const result = await addExercise(name.value, category.value || undefined)
     if (result.error) {
       errorMessage.value = result.error
     } else {

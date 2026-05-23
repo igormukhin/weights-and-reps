@@ -2,13 +2,6 @@ import { test, expect } from '../fixtures'
 import { signInAsTestUser } from '../fixtures/auth'
 import { clearExercises } from '../fixtures/exercises'
 
-// Selectors:
-//   Edit button:          role=button[name="Edit"]         (AppBar, toggles edit mode)
-//   Add exercise FAB:     [data-testid="add-exercise-fab"] (fixed FAB, visible in edit mode)
-//   Exercise name input:  getByLabel('Exercise name')      (v-text-field in AddExerciseDialog)
-//   Add submit button:    role=button[name="Add"]          (v-card-actions in AddExerciseDialog)
-//   Exercise list items:  .exercise-name                   (v-list-item-title in ExerciseListItem)
-
 // Tests share suite-level emulator state: test 2 relies on the exercise added in test 1.
 // Serial mode ensures they run in order within a single browser context lifecycle.
 test.describe.configure({ mode: 'serial' })
@@ -52,5 +45,23 @@ test.describe('Add exercise', () => {
     // Exercises without a colon land in (ungrouped) — expand it to see the item
     await page.getByRole('button', { name: '(ungrouped)' }).click()
     await expect(page.locator('.exercise-name', { hasText: 'Bench Press' })).toBeVisible()
+  })
+
+  test('added exercise with a category appears in its alphabetical group', async ({ page }) => {
+    // Enter edit mode to reveal the add-exercise FAB
+    await page.getByRole('button', { name: 'Edit' }).click()
+
+    // Open the Add Exercise dialog
+    await page.locator('[data-testid="add-exercise-fab"]').click()
+
+    // Fill in the exercise name, category, and submit
+    await page.getByLabel('Exercise name').fill('Incline Press')
+    await page.getByRole('combobox', { name: 'Category (optional)' }).fill('Chest')
+    await page.getByRole('button', { name: 'Add' }).click()
+
+    // Go out of edit mode to check groups
+    await page.getByRole('button', { name: 'Done' }).click()
+    await page.getByRole('button', { name: 'Chest' }).click()
+    await expect(page.locator('.exercise-name', { hasText: 'Incline Press' })).toBeVisible()
   })
 })

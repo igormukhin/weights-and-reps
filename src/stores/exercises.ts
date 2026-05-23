@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { Exercise } from '@/types'
 import { getExercises } from '@/services/exercises'
 
@@ -7,6 +7,14 @@ const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
 export const useExercisesStore = defineStore('exercises', () => {
   const exercises = ref<Exercise[]>([])
+  const categories = computed(() => {
+    const cats = exercises.value
+      .map((e) => e.category?.trim())
+      .filter((c): c is string => !!c)
+    return Array.from(new Set(cats)).sort((a, b) =>
+      a.localeCompare(b, undefined, { sensitivity: 'base' }),
+    )
+  })
   const isLoading = ref(false)
   const lastLoadedAt = ref(0)
   const lastSelectedExerciseId = ref<string | null>(
@@ -46,6 +54,7 @@ export const useExercisesStore = defineStore('exercises', () => {
 
   return {
     exercises,
+    categories,
     isLoading,
     loadExercises,
     getById,

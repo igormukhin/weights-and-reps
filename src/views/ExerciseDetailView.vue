@@ -1,7 +1,12 @@
 <template>
   <v-app-bar color="primary" density="comfortable" :data-save-status="saveStatus">
     <v-btn :icon="mdiArrowLeft" @click="router.back()" />
-    <v-app-bar-title>{{ exercise?.name ?? '' }}</v-app-bar-title>
+    <v-app-bar-title>
+      <div class="text-h6 font-weight-bold">{{ exercise?.name ?? '' }}</div>
+      <div v-if="exercise?.category" class="text-caption mt-n1" style="color: rgba(255, 255, 255, 0.7) !important;">
+        {{ exercise.category }}
+      </div>
+    </v-app-bar-title>
     <template #append>
       <!-- Save status indicator -->
       <v-chip
@@ -26,13 +31,17 @@
     v-if="showRenameDialog && exercise"
     :exercise-id="exerciseId"
     :current-name="exercise.name"
+    :current-category="exercise.category"
     @close="showRenameDialog = false"
   />
 
   <v-main>
     <v-container>
 
-      <p v-if="exercise" class="text-subtitle-1 mb-4">{{ exercise.name }}</p>
+      <p v-if="exercise" class="text-subtitle-1 mb-4">
+        <span v-if="exercise.category" class="text-medium-emphasis mr-1">{{ exercise.category }}:</span>
+        <span>{{ exercise.name }}</span>
+      </p>
 
       <!-- LOADING STATE -->
       <div v-if="isLoading" class="d-flex justify-center mt-8">

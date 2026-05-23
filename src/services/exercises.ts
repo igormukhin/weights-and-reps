@@ -39,18 +39,32 @@ export async function getExerciseById(uid: string, id: string): Promise<Exercise
 // Write (added in Phase 4 / T023)
 // ---------------------------------------------------------------------------
 
-export async function createExercise(uid: string, name: string, position: number): Promise<string> {
+export async function createExercise(
+  uid: string,
+  name: string,
+  position: number,
+  category?: string,
+): Promise<string> {
   const ref = await addDoc(exercisesRef(uid), {
     name,
     position,
     archived: false,
+    category: category || null,
     createdAt: serverTimestamp(),
   })
   return ref.id
 }
 
-export async function renameExercise(uid: string, id: string, newName: string): Promise<void> {
-  await updateDoc(doc(db, 'users', uid, 'exercises', id), { name: newName })
+export async function updateExercise(
+  uid: string,
+  id: string,
+  name: string,
+  category?: string,
+): Promise<void> {
+  await updateDoc(doc(db, 'users', uid, 'exercises', id), {
+    name,
+    category: category || null,
+  })
 }
 
 export async function archiveExercise(uid: string, id: string): Promise<void> {

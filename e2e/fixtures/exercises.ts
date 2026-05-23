@@ -41,8 +41,18 @@ export async function seedExercise(page: Page, name: string, position: number): 
       const uid = w.__e2eAuth.currentUser?.uid
       if (!uid) throw new Error('seedExercise: no authenticated user — call signInAsTestUser first')
       const ref = w.__e2eCollection(w.__e2eDb, 'users', uid, 'exercises')
+
+      let finalName = exerciseName
+      let category: string | null = null
+      const colonIndex = exerciseName.indexOf(':')
+      if (colonIndex !== -1) {
+        category = exerciseName.slice(0, colonIndex).trim()
+        finalName = exerciseName.slice(colonIndex + 1).trim()
+      }
+
       const docRef = await w.__e2eAddDoc(ref, {
-        name: exerciseName,
+        name: finalName,
+        category: category || null,
         position: exercisePosition,
         archived: false,
         createdAt: w.__e2eServerTimestamp(),

@@ -8,7 +8,8 @@
     </template>
 
     <v-list-item-title class="exercise-name">
-      {{ exercise.name }}
+      <span v-if="exercise.category" class="text-medium-emphasis mr-1">{{ exercise.category }}:</span>
+      <span>{{ exercise.name }}</span>
     </v-list-item-title>
 
     <template #append>
@@ -33,6 +34,7 @@
     v-if="showEdit"
     :exercise-id="exercise.id"
     :current-name="exercise.name"
+    :current-category="exercise.category"
     @close="onEditClose"
   />
 
