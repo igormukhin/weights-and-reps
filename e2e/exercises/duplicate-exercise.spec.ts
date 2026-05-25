@@ -62,7 +62,8 @@ test.describe('Duplicate exercise validation', () => {
     // Let's find "Bench Press" under "Home" and try renaming it to "Bench Press" under "Chest"
     const item = page
       .locator('.exercise-item')
-      .filter({ has: page.getByText('Home: Bench Press', { exact: true }) })
+      .filter({ has: page.locator('.exercise-name', { hasText: 'Home:' }) })
+      .filter({ has: page.locator('.exercise-name', { hasText: 'Bench Press' }) })
     await item.locator('[data-testid="rename-exercise-btn"]').click()
 
     // Change category to "Chest"
