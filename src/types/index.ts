@@ -82,6 +82,8 @@ export interface ExerciseLogState {
   lastSets: Set[]
   /** Date of the last ExerciseLog, formatted DD.MM.YYYY. Empty string if none. */
   lastExerciseLogDate: string
+  /** Last Past ExerciseLogs for the Exercise, newest first. */
+  pastExerciseLogs: ExerciseLog[]
   /** Current auto-save status. */
   saveStatus: SaveStatus
   /** Error message when saveStatus is 'error'. Null otherwise. */

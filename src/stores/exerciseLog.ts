@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Set } from '@/types'
+import type { ExerciseLog, Set } from '@/types'
 
 export interface CachedExerciseLog {
   date: string
@@ -9,6 +9,7 @@ export interface CachedExerciseLog {
   todaySets: Partial<Set>[]
   lastSets: Set[]
   lastExerciseLogDate: string
+  pastExerciseLogs: ExerciseLog[]
 }
 
 export const useExerciseLogStore = defineStore('exerciseLog', () => {

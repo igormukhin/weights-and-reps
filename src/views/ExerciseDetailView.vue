@@ -55,7 +55,7 @@
           Last training: {{ lastExerciseLogDate }}
         </p>
 
-        <table v-if="lastSets.length > 0" class="mb-4">
+        <table v-if="lastSets.length > 0" data-testid="last-exercise-log-table" class="mb-4">
           <thead>
             <tr class="text-caption text-medium-emphasis">
               <th class="text-left pb-1 pr-6">#</th>
@@ -75,9 +75,24 @@
         </table>
 
         <!-- Empty state -->
-        <p v-else class="text-body-2 text-medium-emphasis mb-4">
+        <p v-else-if="pastExerciseLogRows.length === 0" class="text-body-2 text-medium-emphasis mb-4">
           No logs recorded yet
         </p>
+
+        <table v-if="pastExerciseLogRows.length > 0" data-testid="past-exercise-logs-table" class="mb-4">
+          <thead>
+            <tr class="text-caption text-medium-emphasis">
+              <th class="text-left pb-1 pr-6">When</th>
+              <th class="text-right pb-1">Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in pastExerciseLogRows" :key="row.date" class="text-body-1">
+              <td class="pr-6 py-1">{{ row.when }}</td>
+              <td class="text-right py-1">{{ row.weight }}</td>
+            </tr>
+          </tbody>
+        </table>
 
         <!-- Pump it! button -->
         <v-btn color="primary" block class="mt-6" @click="startExerciseLog()">
@@ -162,6 +177,8 @@ import { useExerciseLog } from '@/composables/useExerciseLog'
 import SetRow from '@/components/exerciseLog/SetRow.vue'
 import DeleteExerciseLogDialog from '@/components/exerciseLog/DeleteExerciseLogDialog.vue'
 import EditExerciseDialog from '@/components/exercises/EditExerciseDialog.vue'
+import { formatPastExerciseLogWhen } from '@/utils/date'
+import { formatWeight, getMaxWeight } from '@/utils/exerciseLogSummary'
 
 const route = useRoute()
 const router = useRouter()
@@ -186,6 +203,7 @@ const {
   todaySets,
   lastSets,
   lastExerciseLogDate,
+  pastExerciseLogs,
   saveStatus,
   saveError,
   init,
@@ -199,6 +217,12 @@ const {
 const showError = ref(false)
 const showDeleteDialog = ref(false)
 const showRenameDialog = ref(false)
+
+const pastExerciseLogRows = computed(() => pastExerciseLogs.value.map((log) => ({
+  date: log.date,
+  when: formatPastExerciseLogWhen(log.date),
+  weight: formatWeight(getMaxWeight(log)),
+})))
 
 watch(saveError, (val) => {
   if (val) showError.value = true

@@ -1,9 +1,9 @@
 import { ref } from 'vue'
 import type { Ref } from 'vue'
-import type { Set, SaveStatus } from '@/types'
+import type { ExerciseLog, Set, SaveStatus } from '@/types'
 import {
   getTodayExerciseLog,
-  getLastExerciseLog,
+  getPastExerciseLogs,
   saveExerciseLog,
   deleteExerciseLog as deleteExerciseLogService,
 } from '@/services/exerciseLogs'
@@ -20,6 +20,7 @@ export function useExerciseLog(uid: string, exerciseId: string) {
   const todaySets = ref<Partial<Set>[]>([])
   const lastSets = ref<Set[]>([])
   const lastExerciseLogDate = ref('')
+  const pastExerciseLogs = ref<ExerciseLog[]>([])
   const saveStatus = ref<SaveStatus>('idle')
   const saveError = ref<string | null>(null)
 
@@ -36,6 +37,7 @@ export function useExerciseLog(uid: string, exerciseId: string) {
       todaySets: todaySets.value.map((s) => ({ ...s })),
       lastSets: lastSets.value,
       lastExerciseLogDate: lastExerciseLogDate.value,
+      pastExerciseLogs: pastExerciseLogs.value,
     })
   }
 
@@ -53,6 +55,7 @@ export function useExerciseLog(uid: string, exerciseId: string) {
       todaySets.value = cached.todaySets.map((s) => ({ ...s }))
       lastSets.value = cached.lastSets
       lastExerciseLogDate.value = cached.lastExerciseLogDate
+      pastExerciseLogs.value = cached.pastExerciseLogs
       if (hasTodayExerciseLog.value) {
         enforceRowInvariants(todaySets.value)
         syncToCache()
@@ -62,11 +65,13 @@ export function useExerciseLog(uid: string, exerciseId: string) {
     }
 
     // Cache miss — fetch from Firestore
-    const [todayLog, lastLog] = await Promise.all([
+    const [todayLog, pastLogs] = await Promise.all([
       getTodayExerciseLog(uid, exerciseId, today),
-      getLastExerciseLog(uid, exerciseId, today),
+      getPastExerciseLogs(uid, exerciseId, today, 6),
     ])
 
+    const lastLog = pastLogs[0]
+    pastExerciseLogs.value = pastLogs
     lastSets.value = lastLog?.sets ?? []
     lastExerciseLogDate.value = lastLog ? formatGermanDate(lastLog.date) : ''
 
@@ -222,6 +227,7 @@ export function useExerciseLog(uid: string, exerciseId: string) {
     todaySets: todaySets as Ref<Partial<Set>[]>,
     lastSets,
     lastExerciseLogDate,
+    pastExerciseLogs,
     saveStatus,
     saveError,
     init,

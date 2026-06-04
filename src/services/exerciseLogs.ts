@@ -6,6 +6,7 @@ import {
   setDoc,
   deleteDoc,
   query,
+  where,
   orderBy,
   limit,
   serverTimestamp,
@@ -32,14 +33,24 @@ export async function getLastExerciseLog(
   exerciseId: string,
   todayStr: string,
 ): Promise<ExerciseLog | null> {
-  const q = query(exerciseLogsRef(uid, exerciseId), orderBy('date', 'desc'), limit(2))
-  const snap = await getDocs(q)
-  const docs = snap.docs.map((d) => d.data() as ExerciseLog)
+  const logs = await getPastExerciseLogs(uid, exerciseId, todayStr, 1)
+  return logs[0] ?? null
+}
 
-  // If first result is today, last ExerciseLog is the second result
-  if (docs.length === 0) return null
-  if (docs[0].date === todayStr) return docs[1] ?? null
-  return docs[0]
+export async function getPastExerciseLogs(
+  uid: string,
+  exerciseId: string,
+  todayStr: string,
+  maxCount: number,
+): Promise<ExerciseLog[]> {
+  const q = query(
+    exerciseLogsRef(uid, exerciseId),
+    where('date', '<', todayStr),
+    orderBy('date', 'desc'),
+    limit(maxCount),
+  )
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => d.data() as ExerciseLog)
 }
 
 export async function saveExerciseLog(

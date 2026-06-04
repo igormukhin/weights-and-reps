@@ -17,3 +17,22 @@ export function formatGermanDate(isoDateStr: string): string {
   const [year, month, day] = isoDateStr.split('-')
   return `${day}.${month}.${year}`
 }
+
+function isoDateToUtcDay(isoDateStr: string): number {
+  const [year, month, day] = isoDateStr.split('-').map(Number)
+  return Date.UTC(year, month - 1, day) / 86_400_000
+}
+
+export function calendarDaysBetween(startIsoDate: string, endIsoDate: string): number {
+  return isoDateToUtcDay(endIsoDate) - isoDateToUtcDay(startIsoDate)
+}
+
+export function formatPastExerciseLogWhen(logDate: string, today: string = todayISO()): string {
+  const days = calendarDaysBetween(logDate, today)
+
+  if (days <= 30) {
+    return days === 1 ? '1 day ago' : `${days} days ago`
+  }
+
+  return formatGermanDate(logDate)
+}

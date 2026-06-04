@@ -8,9 +8,17 @@ A personal strength training tracker. Users log sets for individual exercises ea
 The record of all sets performed for one exercise on one calendar date.
 _Avoid_: Session, training session, workout log
 
+**Past ExerciseLog**:
+An ExerciseLog for a given Exercise on a date before today.
+_Avoid_: Previous exercise log, historical log
+
 **Set**:
 One group of repetitions at a given weight within an ExerciseLog. Weight is in kilograms; negative values indicate assisted resistance (convention, not a distinct type).
 _Avoid_: row, entry, rep group
+
+**Max Weight**:
+The highest weight among the Sets in one ExerciseLog. It ignores repetitions and BumpIt; for assisted exercises, less assistance counts as higher weight.
+_Avoid_: PR, one-rep max, best set
 
 **BumpIt**:
 A manual reminder flag on a Set indicating the user intends to increase the weight the next time they train this exercise.
@@ -37,11 +45,11 @@ The per-exercise screen that hosts either Overview mode or Logging mode dependin
 _Avoid_: Exercise Detail, Training Screen, Exercise Log Screen
 
 **Overview mode**:
-The ExerciseDetail screen state when no ExerciseLog exists for today. Shows history, past logs, and (future) progress charts for the exercise.
+The Exercise Screen state when no ExerciseLog exists for today. Shows history, past logs, and (future) progress charts for the exercise.
 _Avoid_: Review mode, read-only mode, standby
 
 **Logging mode**:
-The ExerciseDetail screen state when an ExerciseLog exists for today. The user is actively entering or editing today's sets.
+The Exercise Screen state when an ExerciseLog exists for today. The user is actively entering or editing today's sets.
 _Avoid_: Edit mode, active mode, session mode
 
 ## Relationships
@@ -50,7 +58,7 @@ _Avoid_: Edit mode, active mode, session mode
 - An **ExerciseLog** contains one or more **Sets**
 - A **Set** may carry a **BumpIt** flag
 - An **Exercise** belongs to at most one **ExerciseCategory** (defined by its `category` field)
-- The **last ExerciseLog** is the most recent past ExerciseLog for a given Exercise — shown read-only as a reference when logging today
+- The **last ExerciseLog** is the most recent **Past ExerciseLog** for a given Exercise — shown read-only as a reference when logging today
 
 ## Example dialogue
 
