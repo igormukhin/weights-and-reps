@@ -23,15 +23,17 @@ export function useExerciseLog(uid: string, exerciseId: string) {
   const pastExerciseLogs = ref<ExerciseLog[]>([])
   const saveStatus = ref<SaveStatus>('idle')
   const saveError = ref<string | null>(null)
+  const activeDate = ref(todayISO())
 
   let saveTimer: ReturnType<typeof setTimeout> | null = null
+  let refreshPromise: Promise<void> | null = null
 
   // ---------------------------------------------------------------------------
   // Cache sync
   // ---------------------------------------------------------------------------
   function syncToCache(): void {
     exerciseLogStore.set(exerciseId, {
-      date: todayISO(),
+      date: activeDate.value,
       hasTodayExerciseLog: hasTodayExerciseLog.value,
       isExerciseLogPersisted: isExerciseLogPersisted.value,
       todaySets: todaySets.value.map((s) => ({ ...s })),
@@ -42,13 +44,16 @@ export function useExerciseLog(uid: string, exerciseId: string) {
   }
 
   // ---------------------------------------------------------------------------
-  // Init: load today's ExerciseLog and last ExerciseLog on mount
+  // Init: load the ExerciseLog and history for Today.
   // ---------------------------------------------------------------------------
-  async function init(): Promise<void> {
-    const today = todayISO()
+  async function loadForDate(date: string, { force = false }: { force?: boolean } = {}): Promise<void> {
+    activeDate.value = date
+    isLoading.value = true
+    saveStatus.value = 'idle'
+    saveError.value = null
 
-    // Serve from cache if available (same calendar day)
-    const cached = exerciseLogStore.get(exerciseId, today)
+    // Serve from cache if available for this calendar date.
+    const cached = force ? null : exerciseLogStore.get(exerciseId, date)
     if (cached) {
       hasTodayExerciseLog.value = cached.hasTodayExerciseLog
       isExerciseLogPersisted.value = cached.isExerciseLogPersisted
@@ -66,8 +71,8 @@ export function useExerciseLog(uid: string, exerciseId: string) {
 
     // Cache miss — fetch from Firestore
     const [todayLog, pastLogs] = await Promise.all([
-      getTodayExerciseLog(uid, exerciseId, today),
-      getPastExerciseLogs(uid, exerciseId, today, 6),
+      getTodayExerciseLog(uid, exerciseId, date),
+      getPastExerciseLogs(uid, exerciseId, date, 6),
     ])
 
     const lastLog = pastLogs[0]
@@ -91,8 +96,12 @@ export function useExerciseLog(uid: string, exerciseId: string) {
     syncToCache()
   }
 
+  async function init(): Promise<void> {
+    await loadForDate(todayISO())
+  }
+
   // ---------------------------------------------------------------------------
-  // Start a new ExerciseLog: pre-fill from last log, enter Logging mode.
+  // Start a new ExerciseLog for the active date: pre-fill from last log, enter Logging mode.
   // ExerciseLog is NOT written to Firestore yet — that happens on first data entry.
   // ---------------------------------------------------------------------------
   function startExerciseLog(): void {
@@ -130,7 +139,7 @@ export function useExerciseLog(uid: string, exerciseId: string) {
   }
 
   // ---------------------------------------------------------------------------
-  // Delete today's ExerciseLog
+  // Delete the active ExerciseLog.
   // ---------------------------------------------------------------------------
   async function deleteExerciseLog(): Promise<void> {
     // Cancel any pending debounced save so it doesn't fire after deletion
@@ -141,7 +150,7 @@ export function useExerciseLog(uid: string, exerciseId: string) {
 
     if (isExerciseLogPersisted.value) {
       try {
-        await deleteExerciseLogService(uid, exerciseId, todayISO())
+        await deleteExerciseLogService(uid, exerciseId, activeDate.value)
       } catch (e) {
         saveStatus.value = 'error'
         saveError.value = 'Failed to delete. Check your connection.'
@@ -163,21 +172,24 @@ export function useExerciseLog(uid: string, exerciseId: string) {
   function scheduleSave(): void {
     if (saveTimer !== null) clearTimeout(saveTimer)
     saveStatus.value = 'idle'
+    const date = activeDate.value
     saveTimer = setTimeout(() => {
-      void persist()
+      saveTimer = null
+      void persist(date)
     }, 2000)
   }
 
   /** Cancel any pending debounced save and persist immediately. Call on navigation away. */
-  function flushSave(): void {
+  async function flushSave(): Promise<boolean> {
     if (saveTimer !== null) {
       clearTimeout(saveTimer)
       saveTimer = null
-      void persist()
+      return await persist(activeDate.value)
     }
+    return true
   }
 
-  async function persist(): Promise<void> {
+  async function persist(date: string = activeDate.value): Promise<boolean> {
     const validSets = todaySets.value.filter(
       (s): s is Set => s.weight !== undefined,
     )
@@ -188,7 +200,7 @@ export function useExerciseLog(uid: string, exerciseId: string) {
         saveStatus.value = 'saving'
         saveError.value = null
         try {
-          await deleteExerciseLogService(uid, exerciseId, todayISO())
+          await deleteExerciseLogService(uid, exerciseId, date)
           isExerciseLogPersisted.value = false
           saveStatus.value = 'saved'
           syncToCache()
@@ -196,9 +208,10 @@ export function useExerciseLog(uid: string, exerciseId: string) {
           saveStatus.value = 'error'
           saveError.value = 'Failed to save. Check your connection.'
           console.error(e)
+          return false
         }
       }
-      return
+      return true
     }
 
     saveStatus.value = 'saving'
@@ -207,16 +220,35 @@ export function useExerciseLog(uid: string, exerciseId: string) {
     try {
       await saveExerciseLog(uid, exerciseId, {
         exerciseId,
-        date: todayISO(),
+        date,
         sets: validSets,
       })
       saveStatus.value = 'saved'
       isExerciseLogPersisted.value = true
       syncToCache()
+      return true
     } catch (e) {
       saveStatus.value = 'error'
       saveError.value = 'Failed to save. Check your connection.'
       console.error(e)
+      return false
+    }
+  }
+
+  async function refreshForCurrentDate(): Promise<void> {
+    if (todayISO() === activeDate.value) return
+    if (refreshPromise) return refreshPromise
+
+    refreshPromise = (async () => {
+      const flushed = await flushSave()
+      if (!flushed) return
+      await loadForDate(todayISO(), { force: true })
+    })()
+
+    try {
+      await refreshPromise
+    } finally {
+      refreshPromise = null
     }
   }
 
@@ -232,6 +264,7 @@ export function useExerciseLog(uid: string, exerciseId: string) {
     saveError,
     init,
     flushSave,
+    refreshForCurrentDate,
     startExerciseLog,
     updateSet,
     toggleBumpIt,

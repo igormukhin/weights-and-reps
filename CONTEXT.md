@@ -4,6 +4,10 @@ A personal strength training tracker. Users log sets for individual exercises ea
 
 ## Language
 
+**Today**:
+The user's current local calendar date. It determines whether an ExerciseLog is today's ExerciseLog or a Past ExerciseLog.
+_Avoid_: UTC day, server date
+
 **ExerciseLog**:
 The record of all sets performed for one exercise on one calendar date.
 _Avoid_: Session, training session, workout log
@@ -56,6 +60,7 @@ _Avoid_: Edit mode, active mode, session mode
 
 - An **Exercise** has zero or more **ExerciseLogs** (one per training day)
 - An **ExerciseLog** contains one or more **Sets**
+- A **Set** belongs to its **ExerciseLog**; it does not move to a different ExerciseLog when Today changes
 - A **Set** may carry a **BumpIt** flag
 - An **Exercise** belongs to at most one **ExerciseCategory** (defined by its `category` field)
 - The **last ExerciseLog** is the most recent **Past ExerciseLog** for a given Exercise — shown read-only as a reference when logging today

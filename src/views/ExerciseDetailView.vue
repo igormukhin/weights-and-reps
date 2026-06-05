@@ -48,7 +48,7 @@
         <v-progress-circular indeterminate color="primary" />
       </div>
 
-      <!-- READ-ONLY MODE: no today ExerciseLog -->
+      <!-- Overview mode: no ExerciseLog exists for Today -->
       <template v-else-if="!hasTodayExerciseLog">
 
         <p v-if="lastExerciseLogDate" class="text-body-2 text-medium-emphasis mb-4">
@@ -95,13 +95,13 @@
         </table>
 
         <!-- Pump it! button -->
-        <v-btn color="primary" block class="mt-6" @click="startExerciseLog()">
+        <v-btn color="primary" block class="mt-6" @click="handleStartExerciseLog">
           Pump it!
         </v-btn>
 
       </template>
 
-      <!-- EDIT MODE: today ExerciseLog exists -->
+      <!-- Logging mode: an ExerciseLog exists for Today -->
       <template v-else-if="hasTodayExerciseLog">
 
         <!-- Column headers -->
@@ -208,6 +208,7 @@ const {
   saveError,
   init,
   flushSave,
+  refreshForCurrentDate,
   startExerciseLog,
   updateSet,
   toggleBumpIt,
@@ -250,8 +251,34 @@ async function handleDelete(): Promise<void> {
   await deleteExerciseLog()
 }
 
+async function handleStartExerciseLog(): Promise<void> {
+  await refreshForCurrentDate()
+  if (!hasTodayExerciseLog.value) {
+    startExerciseLog()
+  }
+}
+
+function handleResume(): void {
+  void refreshForCurrentDate()
+}
+
+function handleVisibilityChange(): void {
+  if (document.visibilityState === 'visible') {
+    handleResume()
+  }
+}
+
+function handlePageShow(event: PageTransitionEvent): void {
+  if (event.persisted) {
+    handleResume()
+  }
+}
+
 onBeforeUnmount(() => {
-  flushSave()
+  window.removeEventListener('focus', handleResume)
+  window.removeEventListener('pageshow', handlePageShow)
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+  void flushSave()
 })
 
 onMounted(async () => {
@@ -259,5 +286,8 @@ onMounted(async () => {
     await exercisesStore.loadExercises(authStore.currentUser.uid)
   }
   await init()
+  window.addEventListener('focus', handleResume)
+  window.addEventListener('pageshow', handlePageShow)
+  document.addEventListener('visibilitychange', handleVisibilityChange)
 })
 </script>
