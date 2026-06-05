@@ -25,9 +25,4 @@ export function onAuthStateChanged(callback: (user: User | null) => void): () =>
  * Resolves once Firebase has determined the initial auth state.
  * Use this to block router navigation until auth is ready.
  */
-export const authReady: Promise<User | null> = new Promise((resolve) => {
-  const unsubscribe = firebaseOnAuthStateChanged(auth, (user) => {
-    unsubscribe()
-    resolve(user)
-  })
-})
+export const authReady: Promise<User | null> = auth.authStateReady().then(() => auth.currentUser)

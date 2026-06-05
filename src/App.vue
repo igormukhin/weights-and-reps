@@ -7,7 +7,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
 
-// Instantiating the store here starts the Firebase auth state listener
-// immediately, ensuring it's active before any route guard runs.
+// Keep Firebase auth state synced into Pinia while the app is mounted.
 useAuthStore()
 </script>

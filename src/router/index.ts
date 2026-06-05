@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { authReady } from '@/services/auth'
+import { recoverFromChunkLoadError } from './chunkLoadRecovery'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -37,9 +38,10 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   // Wait for Firebase to resolve the initial auth state before any guard logic.
-  await authReady
+  const user = await authReady
 
   const authStore = useAuthStore()
+  authStore.setUser(user)
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return { name: 'login' }
@@ -48,6 +50,16 @@ router.beforeEach(async (to) => {
   if (to.name === 'login' && authStore.isAuthenticated) {
     return { name: 'exercises' }
   }
+})
+
+router.onError((error, to) => {
+  if (recoverFromChunkLoadError(error, to)) return
+
+  console.error(error)
+})
+
+router.afterEach(() => {
+  recoverFromChunkLoadError.clear()
 })
 
 export default router
