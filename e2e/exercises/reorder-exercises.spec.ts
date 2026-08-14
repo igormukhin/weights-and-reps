@@ -1,6 +1,6 @@
 import { test, expect } from '../fixtures'
 import { signInAsTestUser } from '../fixtures/auth'
-import { clearExercises, seedExercise } from '../fixtures/exercises'
+import { clearExercises, getExerciseNamesByPosition, seedExercise } from '../fixtures/exercises'
 
 // Test 2 relies on state from test 1. Serial mode ensures ordering.
 test.describe.configure({ mode: 'serial' })
@@ -44,6 +44,11 @@ test.describe('Reorder exercises', () => {
     await expect(names.nth(0)).toHaveText('Deadlift')
     await expect(names.nth(1)).toHaveText('Bench Press')
     await expect(names.nth(2)).toHaveText('Squat')
+    await expect.poll(() => getExerciseNamesByPosition(page)).toEqual([
+      'Deadlift',
+      'Bench Press',
+      'Squat',
+    ])
   })
 
   test('reordered list persists after page reload', async ({ page }) => {

@@ -1,11 +1,18 @@
 import type { Page } from '@playwright/test'
 
+type ExerciseSnapshot = {
+  name?: string
+  position?: number
+  archived?: boolean
+}
+
 type WindowE2E = {
   __e2eAuth: { currentUser: { uid: string } }
   __e2eDb: unknown
   __e2eAddDoc: (ref: unknown, data: unknown) => Promise<unknown>
   __e2eCollection: (db: unknown, ...segments: string[]) => unknown
   __e2eServerTimestamp: () => unknown
+  __e2eGetExercises: () => Promise<ExerciseSnapshot[]>
 }
 
 /**
@@ -61,4 +68,15 @@ export async function seedExercise(page: Page, name: string, position: number): 
     },
     [name, position] as [string, number],
   )
+}
+
+export async function getExerciseNamesByPosition(page: Page): Promise<string[]> {
+  return await page.evaluate(async () => {
+    const w = window as unknown as { __e2eGetExercises?: () => Promise<ExerciseSnapshot[]> }
+    if (!w.__e2eGetExercises) {
+      throw new Error('getExerciseNamesByPosition: __e2eGetExercises not found — ensure emulator build')
+    }
+    const exercises = await w.__e2eGetExercises()
+    return exercises.map((exercise) => exercise.name ?? '')
+  })
 }

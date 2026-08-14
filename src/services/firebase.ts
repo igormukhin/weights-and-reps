@@ -14,6 +14,12 @@ import {
 } from 'firebase/firestore'
 import { getAuth, connectAuthEmulator, signInWithEmailAndPassword } from 'firebase/auth'
 
+type E2EExerciseDoc = {
+  name?: string
+  position?: number
+  archived?: boolean
+}
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -50,6 +56,16 @@ if (useEmulator) {
     await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)))
   }
   ;(window as unknown as Record<string, unknown>).__e2eClearExercises = clearExercises
+  const getExercises = async (): Promise<E2EExerciseDoc[]> => {
+    if (!auth.currentUser) return []
+    const uid = auth.currentUser.uid
+    const snap = await getDocs(collection(db, 'users', uid, 'exercises'))
+    return snap.docs
+      .map((d) => d.data() as E2EExerciseDoc)
+      .filter((exercise) => !exercise.archived)
+      .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+  }
+  ;(window as unknown as Record<string, unknown>).__e2eGetExercises = getExercises
   ;(window as unknown as Record<string, unknown>).__e2eSetDoc = setDoc
   ;(window as unknown as Record<string, unknown>).__e2eDoc = doc
   const clearExerciseLogs = async (exerciseId: string): Promise<void> => {
