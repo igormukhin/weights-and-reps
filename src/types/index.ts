@@ -4,9 +4,15 @@ import type { Timestamp } from 'firebase/firestore'
 // Domain types
 // ---------------------------------------------------------------------------
 
+/** Allowed Weight Step values in kilograms. */
+export type WeightStep = 1 | 2.5
+
+/** Default Weight Step in kilograms when not explicitly set on an Exercise. */
+export const DEFAULT_WEIGHT_STEP: WeightStep = 2.5
+
 /** A single set within an ExerciseLog. Embedded in ExerciseLog.sets. */
 export interface Set {
-  /** Weight in kilograms. Negative values represent assisted exercises. Step: 2.5 kg. */
+  /** Weight in kilograms. Negative values represent assisted exercises. */
   weight: number
   /** Number of repetitions. Minimum 1. Step: 1. Optional — a set with weight only is valid. */
   reps?: number
@@ -32,6 +38,8 @@ export interface Exercise {
   name: string
   /** The exercise category (e.g. Chest, Back). Optional if ungrouped. */
   category?: string
+  /** Kilogram increment for weight stepper controls in Logging mode. Defaults to 2.5 when unset. */
+  weightStep?: WeightStep
   /** Integer display position (1-based). Re-indexed on every reorder/insert. */
   position: number
   /** True if the exercise has been archived. One-way transition; no in-app restore. */
@@ -48,6 +56,7 @@ export interface Exercise {
 export interface CreateExercisePayload {
   name: string
   category?: string
+  weightStep?: WeightStep
 }
 
 /** Payload for updating an existing exercise. */
@@ -55,6 +64,7 @@ export interface UpdateExercisePayload {
   id: string
   name: string
   category?: string
+  weightStep?: WeightStep
 }
 
 /** Payload for saving an ExerciseLog (auto-save). */

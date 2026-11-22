@@ -32,6 +32,7 @@
     :exercise-id="exerciseId"
     :current-name="exercise.name"
     :current-category="exercise.category"
+    :current-weight-step="exercise.weightStep"
     @close="showRenameDialog = false"
   />
 
@@ -179,6 +180,7 @@ import DeleteExerciseLogDialog from '@/components/exerciseLog/DeleteExerciseLogD
 import EditExerciseDialog from '@/components/exercises/EditExerciseDialog.vue'
 import { formatPastExerciseLogWhen } from '@/utils/date'
 import { formatWeight, getMaxWeight } from '@/utils/exerciseLogSummary'
+import { DEFAULT_WEIGHT_STEP } from '@/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -189,12 +191,7 @@ const exerciseId = route.params.id as string
 const uid = authStore.currentUser!.uid
 
 const exercise = computed(() => exercisesStore.getById(exerciseId))
-
-const isDumbbell = computed(() => {
-  const name = exercise.value?.name.toLowerCase() ?? ''
-  return name.includes('dumbbell') || name.includes('kurzhantel')
-})
-const weightStep = computed(() => isDumbbell.value ? 2 : 2.5)
+const weightStep = computed(() => exercise.value?.weightStep ?? DEFAULT_WEIGHT_STEP)
 
 const {
   isLoading,

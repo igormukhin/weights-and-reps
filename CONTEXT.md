@@ -32,6 +32,10 @@ _Avoid_: BumpSignal, weight reminder
 A named strength movement a user tracks over time. Can be archived when no longer in use.
 _Avoid_: lift, movement, workout
 
+**Weight Step**:
+The kilogram increment used by the weight stepper controls when logging Sets for an Exercise. Defaults to 2.5 kg when not explicitly set; does not restrict manually entered weights.
+_Avoid_: step size, increment, weight increment
+
 **ExerciseCategory**:
 A named grouping of exercises. Stored as a separate field (`category`) on the exercise; not a separate top-level collection.
 _Avoid_: ExerciseGroup, group, muscle group
@@ -63,6 +67,7 @@ _Avoid_: Edit mode, active mode, session mode
 - A **Set** belongs to its **ExerciseLog**; it does not move to a different ExerciseLog when Today changes
 - A **Set** may carry a **BumpIt** flag
 - An **Exercise** belongs to at most one **ExerciseCategory** (defined by its `category` field)
+- An **Exercise** has an optional **Weight Step** (defaults to 2.5 kg when unset)
 - The **last ExerciseLog** is the most recent **Past ExerciseLog** for a given Exercise — shown read-only as a reference when logging today
 
 ## Example dialogue

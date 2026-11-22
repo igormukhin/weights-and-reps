@@ -35,6 +35,7 @@
     :exercise-id="exercise.id"
     :current-name="exercise.name"
     :current-category="exercise.category"
+    :current-weight-step="exercise.weightStep"
     @close="onEditClose"
   />
 

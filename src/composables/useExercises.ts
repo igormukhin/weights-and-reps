@@ -1,4 +1,4 @@
-import type { Exercise } from '@/types'
+import type { Exercise, WeightStep } from '@/types'
 import { useExercisesStore } from '@/stores/exercises'
 import {
   createExercise,
@@ -43,7 +43,11 @@ export function useExercises(uid: string) {
   // Public API
   // ---------------------------------------------------------------------------
 
-  async function addExercise(name: string, category?: string): Promise<{ id?: string; error?: string }> {
+  async function addExercise(
+    name: string,
+    category?: string,
+    weightStep?: WeightStep,
+  ): Promise<{ id?: string; error?: string }> {
     const trimmedName = name.trim()
     const trimmedCat = category?.trim() || undefined
     if (!trimmedName) return { error: 'Exercise name is required.' }
@@ -59,13 +63,14 @@ export function useExercises(uid: string) {
     )
 
     // Create the new exercise at the target position
-    const id = await createExercise(uid, trimmedName, insertAt, trimmedCat)
+    const id = await createExercise(uid, trimmedName, insertAt, trimmedCat, weightStep)
 
     // Rebuild store list and re-index cleanly
     const newEx: Exercise = {
       id,
       name: trimmedName,
       category: trimmedCat,
+      weightStep,
       position: insertAt,
       archived: false,
       createdAt: null as unknown as Exercise['createdAt'], // filled by server
@@ -80,6 +85,7 @@ export function useExercises(uid: string) {
     id: string,
     newName: string,
     newCategory?: string,
+    newWeightStep?: WeightStep,
   ): Promise<{ error?: string }> {
     const trimmedName = newName.trim()
     const trimmedCat = newCategory?.trim() || undefined
@@ -104,18 +110,20 @@ export function useExercises(uid: string) {
         e.position >= insertAt ? { ...e, position: e.position + 1 } : e,
       )
 
-      await updateExerciseService(uid, id, trimmedName, trimmedCat)
+      await updateExerciseService(uid, id, trimmedName, trimmedCat, newWeightStep)
 
       ex.name = trimmedName
       ex.category = trimmedCat
+      ex.weightStep = newWeightStep
       ex.position = insertAt
 
       const merged = [...shifted, ex].sort((a, b) => a.position - b.position)
       await reindexAndPersist(merged)
     } else {
-      // Category didn't change -> simply rename the exercise
-      await updateExerciseService(uid, id, trimmedName, trimmedCat)
+      // Category didn't change -> simply update the exercise in place
+      await updateExerciseService(uid, id, trimmedName, trimmedCat, newWeightStep)
       ex.name = trimmedName
+      ex.weightStep = newWeightStep
     }
 
     return {}

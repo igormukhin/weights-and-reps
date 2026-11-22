@@ -30,8 +30,14 @@ npm run lint    # TypeScript check (vue-tsc)
 * **Environment**: Local developer environments usually have the `.env.test` file already set up. Do not proactively copy or overwrite `.env.test` unless it is missing.
 * **Run Command**: Always use the locally installed `firebase-tools` wrapper:
   ```bash
-  npx firebase emulators:exec --only auth,firestore "npm run test:e2e"
+  npx firebase emulators:exec --only auth,firestore "npm run test:e2e -- --reporter=line"
   ```
+* **Non-interactive Reporter**: `playwright.config.ts` enables the `html` reporter, which opens a browser and hangs on `http://localhost:9323` whenever a test fails. Pass `--reporter=line` (or `PLAYWRIGHT_HTML_OPEN=never`) so agent runs exit cleanly on failure.
+* **Targeted Runs**: When iterating on a single spec, pass its path instead of running the full suite:
+  ```bash
+  npx firebase emulators:exec --only auth,firestore "npx playwright test e2e/path/to/spec.spec.ts --reporter=line"
+  ```
+* **Stale Preview Server (`:4173`)**: `webServer` uses `reuseExistingServer: !process.env.CI` on port `4173`. If a `vite preview` process is already running on `4173`, Playwright will test the old build instead of running `npm run build:test` — check/stop `:4173` if changes aren't reflected.
 
 ## Code Style
 

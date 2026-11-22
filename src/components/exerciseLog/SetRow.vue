@@ -51,6 +51,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { DEFAULT_WEIGHT_STEP } from '@/types'
 
 const props = defineProps<{
   setNumber: number
@@ -70,7 +71,7 @@ const emit = defineEmits<{
   'update:bumpIt': [value: boolean]
 }>()
 
-const step = computed(() => props.weightStep ?? 2.5)
+const step = computed(() => props.weightStep ?? DEFAULT_WEIGHT_STEP)
 
 function onWeightFocused(focused: boolean): void {
   if (focused && props.newWeight === undefined && props.prevNewWeight !== undefined) {

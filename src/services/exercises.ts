@@ -9,7 +9,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore'
 import { db } from './firebase'
-import type { Exercise } from '@/types'
+import type { Exercise, WeightStep } from '@/types'
 
 function exercisesRef(uid: string) {
   return collection(db, 'users', uid, 'exercises')
@@ -44,12 +44,14 @@ export async function createExercise(
   name: string,
   position: number,
   category?: string,
+  weightStep?: WeightStep,
 ): Promise<string> {
   const ref = await addDoc(exercisesRef(uid), {
     name,
     position,
     archived: false,
     category: category || null,
+    weightStep: weightStep ?? null,
     createdAt: serverTimestamp(),
   })
   return ref.id
@@ -60,10 +62,12 @@ export async function updateExercise(
   id: string,
   name: string,
   category?: string,
+  weightStep?: WeightStep,
 ): Promise<void> {
   await updateDoc(doc(db, 'users', uid, 'exercises', id), {
     name,
     category: category || null,
+    weightStep: weightStep ?? null,
   })
 }
 
